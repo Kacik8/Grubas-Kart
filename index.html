@@ -2007,7 +2007,7 @@ setInterval(()=>{try{if(!ug&&[...(navigator.getGamepads?navigator.getGamepads():
 const kf=p=>[...p.querySelectorAll("*")].filter(x=>x.tagName==="BUTTON"||x.tagName==="INPUT"||x.tagName==="SELECT");
 const kOf=e=>{let p=e.parentElement;while(p&&!p.id)p=p.parentElement;return p?{id:p.id,i:kf(p).indexOf(e)}:null};
 const vis=e=>!e.disabled&&e.getClientRects().length>0&&getComputedStyle(e).visibility!=="hidden"&&e.getBoundingClientRect().width>0;
-function root(){const L=document.getElementById("lobby"),R=document.getElementById("results"),M=document.getElementById("menu"),PA=document.getElementById("pause");if(typeof G==="undefined")return null;if(G.paused&&PA)return PA;if(L&&!L.hidden)return L;if(G.resultsShown&&R)return R;const N=document.getElementById("nm");if(G.state==="menu"&&N&&getComputedStyle(N).display!=="none")return(window.GKACT&&window.GKACT())?null:N;if(G.state==="menu"&&M&&M.style.display!=="none")return M;return null}
+function root(){const L=document.getElementById("lobby"),R=document.getElementById("results"),M=document.getElementById("menu"),PA=document.getElementById("pause");if(typeof G==="undefined")return null;if(G.paused&&PA&&G.state!=="menu")return PA;if(L&&!L.hidden)return L;if(G.resultsShown&&R&&G.state!=="menu")return R;const N=document.getElementById("nm");if(G.state==="menu"&&N&&getComputedStyle(N).display!=="none")return(window.GKACT&&window.GKACT())?null:N;if(G.state==="menu"&&M&&M.style.display!=="none")return M;return null}
 setInterval(()=>{try{const gs=[...(navigator.getGamepads?navigator.getGamepads():[])].filter(x=>x&&x.connected!==false);if(!gs.length)return;const r=root();{const dg=document.getElementById("padDbg");if(dg)dg.style.display=r?"":"none"}if(!r){if(cur){cur.classList.remove("padfocus");cur=null}return}
 const pd=(g,i)=>!!(g.buttons[i]&&g.buttons[i].pressed),sd=g=>g.mapping==="standard";
 const hat=g=>{if(sd(g))return[0,0,0,0];const h=g.axes[9];if(typeof h!=="number"||h<-1.01||h>1.01)return[0,0,0,0];const t=Math.round((h+1)*3.5);return[t===5||t===6||t===7,t===1||t===2||t===3,t===0||t===1||t===7,t===3||t===4||t===5]};
@@ -2769,6 +2769,7 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
     document.body.dataset.gs=gs;
     if(gs==="menu"){
      try{hazVis(false)}catch(e){}
+     G.resultsShown=false;G.paused=false;
      try{if(typeof COIN!=="undefined"&&COIN.grp)COIN.grp.visible=false;if(typeof ZG!=="undefined")ZG.visible=false}catch(e){}
      const t=document.getElementById("touch");if(t)t.classList.remove("on");
      const c=document.getElementById("count");if(c)c.textContent="";
