@@ -1383,15 +1383,19 @@ function listPads(){
   // Telefon podłączony przez GRUBAS KART jest wystawiany grze jako wirtualny pad.
   const rp=window.remotePhonePad;
   if(rp){
-   const pressed=i=>!!([
-    !!rp.gas,!!rp.brake,!!rp.item,!!rp.reset,!!rp.drift,
-    false,false,false,!!rp.back,!!rp.pause,false,false,
-    false,false,false,false,false
-   ][i]);
-   const buttons=Array.from({length:17},(_,i)=>({pressed:pressed(i),touched:pressed(i),value:pressed(i)?1:0}));
+   // Wirtualny pad używa indeksów zgodnych ze standardowym mapowaniem Gamepad API.
+   const virtualButtons=Array(17).fill(false);
+   virtualButtons[3]=!!rp.reset;
+   virtualButtons[4]=!!rp.drift;       // A / drift
+   virtualButtons[5]=!!rp.item;        // X / przedmiot
+   virtualButtons[8]=!!rp.back;        // Y / wstecz
+   virtualButtons[9]=!!rp.pause;       // Start / pauza
+   virtualButtons[12]=!!rp.gas;
+   virtualButtons[13]=!!rp.brake;
+   const buttons=virtualButtons.map(v=>({pressed:v,touched:v,value:v?1:0}));
    l.push({
     id:"GRUBAS KART Phone Pad",index:999,connected:true,mapping:"standard",
-    axes:[Math.max(-1,Math.min(1,Number(rp.steer)||0)),0,0,0],
+    axes:[Math.max(-1,Math.min(1,Number(rp.steer)||0)),Math.max(-1,Math.min(1,(rp.brake?1:0)-(rp.gas?1:0))),0,0],
     buttons,timestamp:performance.now()
    });
   }
@@ -2812,7 +2816,14 @@ addEventListener("keydown",e=>{kd.add(e.code);kp.add(e.code);if(act()&&guard(e.c
 addEventListener("keyup",e=>{kd.delete(e.code);if(act()&&guard(e.code))e.preventDefault()});
 function dirs(p){const q=PL[p],o={L:0,R:0,U:0,D:0,ok:0,bk:0},gps=[];
  if(q.dev==="pad"){const g=padFor(p);if(g)gps.push(g)}else{if(S.np===1){const g=listPads()[0];if(g)gps.push(g)}const K=effKeys(p),dn=a=>(K[a]||[]).some(c=>kd.has(c)||kp.has(c));o.L=dn("L");o.R=dn("R");o.U=dn("gas");o.D=dn("brake");o.ok=dn("item");o.bk=dn("back")||dn("reset")}
- for(const g of gps){const b=i=>!!(g.buttons[i]&&g.buttons[i].pressed),ax=g.axes[0]||0,ay=g.axes[1]||0;o.L=o.L||ax<-.55||b(14);o.R=o.R||ax>.55||b(15);o.U=o.U||ay<-.55||b(12);o.D=o.D||ay>.55||b(13);o.ok=o.ok||b(0);o.bk=o.bk||b(1);o.next=o.next||b(3)}
+ for(const g of gps){const b=i=>!!(g.buttons[i]&&g.buttons[i].pressed),ax=g.axes[0]||0,ay=g.axes[1]||0;
+  o.L=o.L||ax<-.55||b(14);o.R=o.R||ax>.55||b(15);o.U=o.U||ay<-.55||b(12);o.D=o.D||ay>.55||b(13);
+  if(g.id==="GRUBAS KART Phone Pad"){
+   const rp=window.remotePhonePad||{};
+   // W menu: A zatwierdza, Y cofa. Oś gałki działa we wszystkich czterech kierunkach.
+   o.ok=o.ok||!!rp.drift;o.bk=o.bk||!!rp.back;o.next=o.next||!!rp.pause;
+  }else{o.ok=o.ok||b(0);o.bk=o.bk||b(1);o.next=o.next||b(3)}
+ }
  return o}
 function edge(p,k,v,now,rep){const h=S.h[p]||(S.h[p]={}),was=h[k];h[k]=v;if(S.first)return false;if(v&&!was){h["t"+k]=now+(k==="bk"?2000:(rep?1000:300));return true}if(rep&&v&&was&&now>h["t"+k]){h["t"+k]=now+110;return true}return false}
 function gridCharIndices(){return CHARS.map((c,i)=>i).filter(i=>!CHARS[i].id.startsWith("welfok_")||CHARS[i].id==="welfok_red")}
@@ -3316,7 +3327,7 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
 })();
 </script>
 
-<div id="gameVersion" aria-label="Wersja gry">WERSJA 1.1.2</div>
+<div id="gameVersion" aria-label="Wersja gry">WERSJA 1.1.3</div>
 <style>
 #gameVersion{position:fixed!important;right:18px!important;bottom:14px!important;z-index:2147483647!important;display:block!important;visibility:visible!important;opacity:1!important;color:#fff!important;background:rgba(5,18,32,.82)!important;border:1px solid rgba(230,246,255,.55)!important;border-radius:8px!important;padding:6px 10px!important;font:800 13px Arial,sans-serif!important;letter-spacing:1.5px!important;text-shadow:0 1px 3px #000!important;pointer-events:none!important}
 </style>
