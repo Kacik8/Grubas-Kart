@@ -278,7 +278,7 @@ h1{animation:tf 3.2s ease-in-out infinite}@keyframes tf{50%{transform:translateY
 let LAPS=3;const N=400,HW=28,CURB=1.4,KR=1.7,GROUND=0.1,RS=0.36,NK=10;
 const SET={map:0,laps:3,mode:"solo",game:"race",tourRaces:5,racers:10,team:{on:false,count:2,cols:[],sizes:[]},items:{banana:1,bomb:1,fish:1,super:1,tasty:1,fat:1,sauce:1,gas:1,shower:1,hop:1},tourMaps:[],opp:{on:false,slots:[]}};
 const tmap=r=>{const v=SET.tourMaps[r-1];return v!=null?v:(SET.map+r-1)%MAPS.length};
-const NPLAY={spec:0,solo:1,split:2,split3:3,split4:4},npOf=m=>NPLAY[m]!=null?NPLAY[m]:1;
+const NPLAY={spec:0,solo:1,split:2,split3:3,split4:4,split5:5,split6:6},npOf=m=>NPLAY[m]!=null?NPLAY[m]:1;
 const TCOLS=[{n:"Czerwoni",c:0xe63946},{n:"Pomarańczowi",c:0xff7a1a},{n:"Żółci",c:0xffd23f},{n:"Zieloni",c:0x2fbf4a},{n:"Niebiescy",c:0x2f6bff},{n:"Fioletowi",c:0x9a4dff},{n:"Czarni",c:0x15161c},{n:"Biali",c:0xf4f7fa},{n:"Różowi",c:0xff7fb5},{n:"Brązowi",c:0x7a4a26},{n:"Szarzy",c:0x8b939c},{n:"Złoci",c:0xffc61a,fx:{em:0.22,met:0.9,rough:0.25}},{n:"Srebrni",c:0xc4ccd8,fx:{em:0.18,met:0.9,rough:0.28}},{n:"Diamentowi",c:0x8fe3ff,fx:{em:0.35,met:0.55,rough:0.12}},{n:"Seledynowi",c:0x9dffc8},{n:"Fuksjowi",c:0xff00aa},{n:"Tęczowi",c:0xff4d4d,rb:1}];
 const ANY=()=>Object.values(SET.items).some(Boolean);
 const CHARS=[
@@ -575,7 +575,7 @@ function makeAura(){return new THREE.Mesh(new THREE.SphereGeometry(3.4,16,12),ne
 function makeFood(t){const w=new THREE.Group(),g=new THREE.Group();
  if(t===0){g.add(new THREE.Mesh(new THREE.TorusGeometry(0.7,0.4,10,18),mat(0xd9904a)));const ic=new THREE.Mesh(new THREE.TorusGeometry(0.7,0.42,10,18),mat(0xff7aa8));ic.scale.set(1,1,0.55);ic.position.z=0.12;g.add(ic);g.rotation.x=1.0}
  else if(t===1){g.add(put(cyl(0.9,0.9,0.3,0xd9904a,16),0,-0.45,0));g.add(put(cyl(1,1,0.12,0x5ba33b,16),0,-0.2,0));g.add(put(cyl(0.85,0.85,0.35,0x5b3320,16),0,0,0));g.add(put(sph(0.95,0xe0a35a,1,0.6,1),0,0.45,0))}
- else if(t===3){for(let j=0;j<4;j++)g.add(put(sph(0.85-j*0.12,j%2?0x6fcf5a:0x4aa83c,1,0.9,1),0,0.1+j*0.1,0,0,j*0.8,0));g.add(put(sph(0.5,0x9be58b),0,0.35,0))}
+ else if(t===3){for(let j=0;j<6;j++)g.add(put(sph(0.85-j*0.12,j%2?0x6fcf5a:0x4aa83c,1,0.9,1),0,0.1+j*0.1,0,0,j*0.8,0));g.add(put(sph(0.5,0x9be58b),0,0.35,0))}
  else{g.add(put(new THREE.Mesh(new THREE.ConeGeometry(0.55,1.4,12),mat(0xe0b070)),0,-0.5,0,Math.PI,0,0));g.add(put(sph(0.62,0xffb3d1),0,0.4,0));g.add(put(sph(0.4,0xfff0f5),0,0.95,0))}
  g.traverse(m=>{if(m.isMesh)m.castShadow=true});w.add(g);w.scale.setScalar(1.25);return w}
 function makeTruck(txt){const g=new THREE.Group(),dk=0x1a2230,c=document.createElement("canvas");c.width=512;c.height=160;const x=c.getContext("2d");
@@ -1069,7 +1069,7 @@ let msgTimer=0;
 function setPause(v){
  if(v&&(G.resultsShown||(G.state!=="race"&&G.state!=="count")))return;
  G.paused=!!v;$("pause").style.display=v?"flex":"none";
- if(v){const gl=document.getElementById("glare");if(gl)gl.style.opacity=0;for(const k in keys)keys[k]=false;touch.left=touch.right=touch.brake=false;for(let i=0;i<5;i++)ip[i]=0;document.body.classList.remove("boosting")}
+ if(v){const gl=document.getElementById("glare");if(gl)gl.style.opacity=0;for(const k in keys)keys[k]=false;touch.left=touch.right=touch.brake=false;for(let i=0;i<7;i++)ip[i]=0;document.body.classList.remove("boosting")}
 }
 function msg(t,ms){const m=$("msg");m.textContent=t;m.classList.add("show");clearTimeout(msgTimer);msgTimer=setTimeout(()=>m.classList.remove("show"),ms||1200)}
 const ICONS={banana:"🍌",bomb:"💣",fish:"🐟",super:"🌟",tasty:"🍣",fat:"🧪",sauce:"🍶",gas:"💨",shower:"🚿",hop:"🦘"},INAMES={banana:"Skórka Zagłady",bomb:"Bomba Brzuchowa",fish:"Rybka Stalker",super:"Super Ryba Zemsty",tasty:"Sushi Nieśmiertelności",fat:"Mikstura Wielkiego Brzucha",sauce:"Sos Rybny (Cuchnie)",gas:"Fasolowy Turbo",shower:"Lodowaty Prysznic",hop:"Eliksir Skoku"};
@@ -1368,40 +1368,28 @@ function collide(){
 /* ---------- sterowanie ---------- */
 const keys={},touch={left:false,right:false,brake:false};let SHAKE=0;
 addEventListener("devicemotion",e=>{const a=e.accelerationIncludingGravity||e.acceleration;if(a&&Math.hypot(a.x||0,a.y||0,a.z||0)>28)SHAKE=performance.now()});
-const ip=[0,0,0,0,0];
+const ip=[0,0,0,0,0,0,0];
 const isTouch=window.matchMedia&&window.matchMedia("(pointer: coarse)").matches;
 /* sterowanie wielu graczy na jednej klawiaturze (+ pady) */
-const MOVE=[null,["KeyA","KeyD","KeyW","KeyS"],["ArrowLeft","ArrowRight","ArrowUp","ArrowDown"],["KeyJ","KeyL","KeyI","KeyK"],["KeyF","KeyH","KeyT","KeyG"]];
-const ITEMK=[null,["Space","ShiftLeft","KeyQ","KeyE","KeyX","KeyC","ControlLeft"],["Enter","ShiftRight","ControlRight","Numpad0","NumpadEnter","Slash"],["KeyU","KeyO"],["KeyY","KeyB"]];
-const RESETK=[null,"KeyR","Delete","KeyP","KeyV"],BACKK=[null,"KeyZ","Period","KeyN","KeyM"];
-const padPrev=[0,{},{},{},{}];
+const MOVE=[null,["KeyA","KeyD","KeyW","KeyS"],["ArrowLeft","ArrowRight","ArrowUp","ArrowDown"],["KeyJ","KeyL","KeyI","KeyK"],["KeyF","KeyH","KeyT","KeyG"],["KeyV","KeyN","KeyB","KeyM"],["Numpad4","Numpad6","Numpad8","Numpad5"]];
+const ITEMK=[null,["Space","ShiftLeft","KeyQ","KeyE","KeyX","KeyC","ControlLeft"],["Enter","ShiftRight","ControlRight","Numpad0","NumpadEnter","Slash"],["KeyU","KeyO"],["KeyY","KeyB"],["KeyComma","Period"],["Numpad1","Numpad3"]];
+const RESETK=[null,"KeyR","Delete","KeyP","KeyV","KeyC","Numpad7"],BACKK=[null,"KeyZ","Period","KeyN","KeyM","KeyX","Numpad9"];
+const padPrev=[0,{},{},{},{},{},{}];
 function padEdge(pn,key,down){const st=padPrev[pn],e=down&&!st[key];st[key]=down;return e}
 function listPads(){
  try{
   const l=[];
   for(const g of(navigator.getGamepads?navigator.getGamepads():[]))if(g&&g.connected!==false)l.push(g);
-  // Telefon podłączony przez GRUBAS KART jest wystawiany grze jako wirtualny pad.
-  const rp=window.remotePhonePad;
-  if(rp){
-   // Wirtualny pad używa indeksów zgodnych ze standardowym mapowaniem Gamepad API.
+  // Do sześciu telefonów może działać równocześnie jako osobne wirtualne pady.
+  const rps=window.remotePhonePads||[];
+  rps.forEach((rp,ri)=>{if(!rp)return;
    const virtualButtons=Array(17).fill(false);
-   virtualButtons[0]=!!rp.confirm||!!rp.drift; // A
-   virtualButtons[1]=!!rp.cancel;             // B — hamulec z gałki nie może cofać menu
-   virtualButtons[2]=!!rp.item;               // X
-   virtualButtons[3]=!!rp.next||!!rp.back;    // Y
-   virtualButtons[8]=!!rp.back;               // Select
-   virtualButtons[9]=!!rp.pause;              // Start
-   virtualButtons[12]=!!rp.gas;
-   virtualButtons[13]=!!rp.brake;
-   virtualButtons[14]=!!(Number(rp.steer)<-.35);
-   virtualButtons[15]=!!(Number(rp.steer)>.35);
+   virtualButtons[0]=!!rp.confirm||!!rp.drift;virtualButtons[1]=!!rp.cancel;virtualButtons[2]=!!rp.item;virtualButtons[3]=!!rp.next||!!rp.back;
+   virtualButtons[8]=!!rp.back;virtualButtons[9]=!!rp.pause;virtualButtons[12]=!!rp.gas;virtualButtons[13]=!!rp.brake;
+   virtualButtons[14]=Number(rp.steer)<-.35;virtualButtons[15]=Number(rp.steer)>.35;
    const buttons=virtualButtons.map(v=>({pressed:v,touched:v,value:v?1:0}));
-   l.push({
-    id:"GRUBAS KART Phone Pad",index:999,connected:true,mapping:"standard",
-    axes:[Math.max(-1,Math.min(1,Number(rp.steer)||0)),Math.max(-1,Math.min(1,(rp.brake?1:0)-(rp.gas?1:0))),0,0],
-    buttons,timestamp:performance.now()
-   });
-  }
+   l.push({id:"GRUBAS KART Phone Pad "+(ri+1),index:999+ri,connected:true,mapping:"standard",axes:[Math.max(-1,Math.min(1,Number(rp.steer)||0)),Math.max(-1,Math.min(1,(rp.brake?1:0)-(rp.gas?1:0))),0,0],buttons,timestamp:performance.now()});
+  });
   return l;
  }catch(e){return[]}
 }
@@ -1421,11 +1409,6 @@ function playerInput(k){
  if(pad){L=R=gas=brake=false}
  else{L=dn("L");R=dn("R");gas=dn("gas");brake=dn("brake");if(!mp){L=L||touch.left;R=R||touch.right;gas=gas||(isTouch&&!touch.brake);brake=brake||touch.brake}}
  let g=pad?padRead(pn):null;
- if(pn===1&&window.remotePhonePad){
-  const rp=window.remotePhonePad;
-  const rg={L:rp.steer<-.22,R:rp.steer>.22,gas:!!rp.gas,brake:!!rp.brake,item:!!rp.item,drift:!!rp.drift,back:!!rp.back,reset:!!rp.reset};
-  if(!g)g=rg;else for(const a of Object.keys(rg))g[a]=!!(g[a]||rg[a]);
- }
  if(!g&&!pad&&npOf(G.mode)===1){const gp=listPads()[0];if(gp)g=padFrom(gp,PL[0].padMap)}
  if(g){if(pad){L=g.L;R=g.R;gas=g.gas;brake=g.brake}else{L=L||g.L;R=R||g.R;gas=gas||g.gas;brake=brake||g.brake}if(padEdge(pn,"i",g.item))ip[pn]=0.35}
  if(ip[pn]>0&&!k.item&&!k.rolling&&k.spin<=0&&performance.now()-(k.hk||0)>350){k.hk=performance.now();animalHonk(k);ip[pn]=0}const it=ip[pn]>0;if(it&&k.item&&!k.rolling&&k.spin<=0)ip[pn]=0;
@@ -1480,7 +1463,7 @@ function drawMini(m,f){
 }
 
 /* ---------- menu ---------- */
-const PL=[{ch:0,car:0,dev:"kb",keys:null,padSel:-1,padMap:null,team:-1},{ch:1,car:1,dev:"kb",keys:null,padSel:-1,padMap:null,team:-1},{ch:2,car:2,dev:"kb",keys:null,padSel:-1,padMap:null,team:-1},{ch:3,car:3,dev:"kb",keys:null,padSel:-1,padMap:null,team:-1}];
+const PL=Array.from({length:6},(_,i)=>({ch:i%CHARS.length,car:i%CARS.length,dev:"kb",keys:null,padSel:-1,padMap:null,team:-1}));
 const CTLKEY="grubaskart.ctl.v1";
 function saveCtl(){try{localStorage.setItem(CTLKEY,JSON.stringify(PL.map(q=>({dev:q.dev,keys:q.keys,padSel:q.padSel,padMap:q.padMap}))))}catch(e){}}
 try{const sv=JSON.parse(localStorage.getItem(CTLKEY)||"null");if(Array.isArray(sv))sv.forEach((q,i)=>{if(PL[i]&&q){if(q.dev==="kb"||q.dev==="pad")PL[i].dev=q.dev;if(q.keys&&typeof q.keys==="object")PL[i].keys=q.keys;if(typeof q.padSel==="number")PL[i].padSel=q.padSel;if(q.padMap&&typeof q.padMap==="object")PL[i].padMap=q.padMap}})}catch(e){}
@@ -1497,11 +1480,11 @@ function padFor(i){const np=curNp(),ps=listPads(),q=PL[i];if(!q||q.dev!=="pad")r
  const used=new Set();for(let j=0;j<np;j++)if(PL[j].dev==="pad"&&PL[j].padSel>=0)used.add(PL[j].padSel);
  const free=ps.filter((_,x)=>!used.has(x));let n=0;for(let j=0;j<i;j++)if(PL[j].dev==="pad"&&PL[j].padSel<0)n++;return free[n]||null}
 const sel=PL[0];
-let garage=null;const MG=[null,null,null,null],MGX=(i,n)=>(i-(n-1)/2)*40;
+let garage=null;const MG=Array(6).fill(null),MGX=(i,n)=>(i-(n-1)/2)*40;
 const STATS=[["Prędkość","speed"],["Przyspieszenie","acc"],["Skręcanie","handling"],["Waga","weight"],["Sterowność","control"]];
 function setGarage(){
  const np=Math.max(1,npOf(SET.mode));
- for(let i=0;i<4;i++){if(MG[i]){scene.remove(MG[i].root);MG[i]=null}
+ for(let i=0;i<6;i++){if(MG[i]){scene.remove(MG[i].root);MG[i]=null}
   if(i<np){const r=makeRacer(CHARS[PL[i].ch].id,CARS[PL[i].car]);r.crown.visible=false;addPlatform(r.root);r.root.position.set(MGX(i,np),GROUND,0);scene.add(r.root);MG[i]=r}}
 }
 function hex(c){return"#"+c.toString(16).padStart(6,"0")}
@@ -1571,7 +1554,7 @@ function startRace(cont){
  hs.forEach((r,i)=>{const k=spawnKart(r.ci,r.car,m-hs.length+i,true,r.pn,r.team);k.rid=r;G.locals.push(k)});
  G.player=G.locals[0]||null;G.viewers=G.locals.length?G.locals:[{isViewer:true,pn:0,out:true,finished:false,watch:null,free:null,pv:{},rank:0,er:0,lap:1,team:null}];G.endT=0;G.focus=null;$("waitHint").style.display="none";
  G.paused=false;$("pause").style.display="none";G.state="count";G.count=3;G.goT=0;G.time=0;G.resultsShown=false;G.out=[];G.cr=0;G.rid=(G.rid||0)+1;
- for(let i=0;i<5;i++)ip[i]=0;
+ for(let i=0;i<7;i++)ip[i]=0;
  computeRanks();layoutHud();
  $("menu").style.display="none";$("results").style.display="none";$("hud").style.display="flex";
  if(isTouch&&np===1)$("touch").classList.add("on");
@@ -1630,7 +1613,7 @@ function showResults(){
 let lastCount=0,lastIcon=0,rollIc="–";
 // Nie pozwól, by przycisk otwierający podsumowanie aktywował od razu element nowego ekranu.
 window.__gkResultsPadLock=false;
-const cam2=new THREE.PerspectiveCamera(68,1,1,2200),cam3=new THREE.PerspectiveCamera(68,1,1,2200),cam4=new THREE.PerspectiveCamera(68,1,1,2200),CAMS=[cam,cam2,cam3,cam4];
+const cam2=new THREE.PerspectiveCamera(68,1,1,2200),cam3=new THREE.PerspectiveCamera(68,1,1,2200),cam4=new THREE.PerspectiveCamera(68,1,1,2200),cam5=new THREE.PerspectiveCamera(68,1,1,2200),cam6=new THREE.PerspectiveCamera(68,1,1,2200),CAMS=[cam,cam2,cam3,cam4,cam5,cam6];
 const HUDS=[],ord=n=>n===1?"st":n===2?"nd":n===3?"rd":"th";
 const kname=k=>k.isPlayer?(npOf(G.mode)>1?"Gracz "+k.pn:"Ty"):CHARS[k.ci].name;
 const hudHTML=lbl=>`<div class="hud-top"><div>${lbl?`<div class="small" data-h="lbl">${lbl}</div>`:""}<div class="small">Okrążenie <b data-h="lap">1</b>/<span data-h="laps">3</span></div></div><div class="slot" data-h="slot"><div class="ic" data-h="ic">–</div><div class="small" data-h="nm">brak</div></div><canvas class="mini" data-h="mini" width="160" height="160"></canvas></div><div class="fxb" data-h="fx" hidden></div><div class="spacer"></div><div class="hud-bot"><div><span class="big" data-h="spd">0</span> <span class="small">km/h</span></div><div class="rk"><div class="need" data-h="need"></div><div class="rank" data-h="rank"></div></div></div>`;
@@ -1639,6 +1622,7 @@ function viewRect(i,n,hz){
  if(n===1)return[0,0,1,1];
  if(n===2)return hz?[i*0.5,0,0.5,1]:[0,i*0.5,1,0.5];
  if(n===3)return i===0?[0,0,1,0.5]:[(i-1)*0.5,0.5,0.5,0.5];
+ if(n===5||n===6)return[(i%3)/3,Math.floor(i/3)*0.5,1/3,0.5];
  return[(i%2)*0.5,Math.floor(i/2)*0.5,0.5,0.5];
 }
 function layoutHud(){
@@ -1653,8 +1637,10 @@ function layoutHud(){
   const hh={p,lap:q("lap"),laps:q("laps"),ic:q("ic"),nm:q("nm"),fx:q("fx"),slot:q("slot"),spd:q("spd"),rank:q("rank"),need:q("need"),lbl:q("lbl"),ctx:q("mini").getContext("2d"),rk:0};
   hh.slot.onclick=()=>{ip[p.pn]=0.35};HUDS.push(hh);
  });
+ if(n===5){const map=document.createElement("div");map.id="gkFiveMap";map.style.cssText="position:absolute;left:66.6667%;top:50%;width:33.3333%;height:50%;box-sizing:border-box;border:3px solid #0a1b2e;background:rgba(5,18,32,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#e6f6ff;font-weight:900;z-index:2";map.innerHTML='<div style="padding:4px;font-size:clamp(10px,1.5vw,18px)">🗺️ MAPA TRASY</div><canvas width="320" height="320" style="width:min(90%,90%);height:auto;max-height:82%;aspect-ratio:1"></canvas>';hud.appendChild(map)}
 }
 function updateHud(){
+ const fiveMap=$("gkFiveMap");if(fiveMap&&G.locals[0]){const mc=fiveMap.querySelector("canvas").getContext("2d");drawMini(mc,G.locals[0])}
  for(const h of HUDS){
   const p0=h.p,p=spec(p0);
   {const l=Math.max(1,Math.min(LAPS,p.lap)),E=SER&&SER.game==="elim";h.lap.textContent=E?((l-1)%SET.laps)+1:l;h.laps.textContent=E?SET.laps:LAPS}
@@ -1725,7 +1711,7 @@ function viewCam(v,i,dt){
  else{const s=spec(v);followCam(dt,s,c);if(i===0)G.focus=s}
 }
 function raceFrame(dt,time){
- for(let i=1;i<5;i++)if(ip[i]>0)ip[i]-=dt;
+ for(let i=1;i<7;i++)if(ip[i]>0)ip[i]-=dt;
  if(G.state==="count"){
   G.count-=dt;const n=Math.ceil(G.count);
   if(n!==lastCount&&n>0){lastCount=n;$("count").textContent=n;sfx("beep")}
@@ -1818,7 +1804,7 @@ function frame(now){
  {const gps=listPads();if(welfokOverlayOpen){tickWelfokPad(gps);return}
   const pr=(g,i)=>!!(g.buttons[i]&&g.buttons[i].pressed),st=gps.some(g=>pr(g,9)),s9=gps.some(g=>pr(g,9)),cf=gps.some(g=>pr(g,1));
   if(st&&!padStart){if(G.state==="menu"&&!lobbyOpen)$("go").click();else if($("results").style.display==="flex")$("again").click()}padStart=st;
-  const wa=gps.some(g=>pr(g,0));if(lobbyOpen&&wa&&!padWelfok&&!welfokOverlayOpen){let wi=-1;for(let i=0;i<4;i++){const f=document.activeElement&&document.activeElement.dataset?Number(document.activeElement.dataset.ci):NaN;const ci=HOV[i]!=null?HOV[i]:(Number.isInteger(f)?f:PL[i].ch);if(CHARS[ci]&&CHARS[ci].id==="welfok_red"){wi=i;break}}if(wi>=0)showWelfokPopup(wi)}padWelfok=wa;
+  const wa=gps.some(g=>pr(g,0));if(lobbyOpen&&wa&&!padWelfok&&!welfokOverlayOpen){let wi=-1;for(let i=0;i<6;i++){const f=document.activeElement&&document.activeElement.dataset?Number(document.activeElement.dataset.ci):NaN;const ci=HOV[i]!=null?HOV[i]:(Number.isInteger(f)?f:PL[i].ch);if(CHARS[ci]&&CHARS[ci].id==="welfok_red"){wi=i;break}}if(wi>=0)showWelfokPopup(wi)}padWelfok=wa;
   if(s9&&!padPause){if(G.paused||G.state==="race"||G.state==="count")setPause(!G.paused)}padPause=s9;if(cf&&!padConf&&G.state==="race"&&!G.resultsShown&&!G.paused&&G.time>1&&raceDone())showResults();padConf=cf}
  if(G.state==="menu")menuFrame(dt,tAcc);else if(!G.paused)raceFrame(dt,tAcc);
  renderAll();
@@ -1826,7 +1812,7 @@ function frame(now){
 
 /* ---------- ustawienia wyścigu ---------- */
 const ITN={banana:"🍌 Skórka Zagłady",bomb:"💣 Bomba Brzuchowa",fish:"🐟 Rybka Stalker",super:"🌟 Super Ryba Zemsty",tasty:"🍣 Sushi Nieśmiertelności",fat:"🧪 Mikstura Wielkiego Brzucha",sauce:"🍶 Sos Rybny (Cuchnie)",gas:"💨 Fasolowy Turbo",shower:"🚿 Lodowaty Prysznic",hop:"🦘 Eliksir Skoku"};
-const MODES=[["spec","0 graczy · tryb widza"],["solo","1 gracz"],["split","2 graczy · jeden ekran"],["split3","3 graczy · jeden ekran"],["split4","4 graczy · jeden ekran"]];
+const MODES=[["spec","0 graczy · tryb widza"],["solo","1 gracz"],["split","2 graczy · jeden ekran"],["split3","3 graczy · jeden ekran"],["split4","4 graczy · jeden ekran"],["split5","5 graczy · jeden ekran"],["split6","6 graczy · jeden ekran"]];
 const GAMES=[["race","Klasyczny wyścig"],["tour","Turniej"],["elim","Eliminacje"]],TOURS=[3,5,8,10],GINFO={race:"Jeden wyścig na wybraną liczbę okrążeń.",tour:"Punkty za miejsca: 12 · 10 · 8 · 6 · 5 · 4 · 3 · 2 · 1 · 0. Wygrywa najwięcej punktów po wszystkich wyścigach. Dla każdego wyścigu możesz wybrać własną trasę niżej (Auto = kolejne mapy, od wybranej).",elim:"Wyścig bez przerw: po każdej rundzie (okrążenia wg ustawienia) odpadają 2 ostatnie osoby i jedziesz dalej, np. 10 → 8 → 6 → 4 (zawsze do 4 zawodników), ostatnia runda to finał. Przy miejscu widzisz, które musisz zająć."};
 function buildSet(){
  const mk=(id,label,fn)=>{const b=document.createElement("button");b.className="chip";b.type="button";b.textContent=label;b.onclick=fn;$(id).appendChild(b)};
@@ -1887,20 +1873,20 @@ function refreshSet(){
  if(G.state==="menu"&&!lobbyOpen)setGarage();
  const np=npOf(SET.mode);
  $("plOpen").hidden=!np;$("plSum").innerHTML=!np?'<span class="sumc" style="--pc:#8fb0c8">👁 Tryb widza – wszyscy zawodnicy to boty, Ty oglądasz</span>':PL.slice(0,np).map((q,i)=>'<span class="sumc" style="--pc:'+PCOL[i]+'"><b>G'+(i+1)+'</b>'+(q.dev==="pad"?"🎮":"⌨")+' '+CHARS[q.ch].name+' · '+CARS[q.car].name+'</span>').join("");
- if(lobbyOpen){for(let i=0;i<4;i++)if((i<np)!==!!PV[i])setPv(i);refreshLobby()}
+ if(lobbyOpen){for(let i=0;i<6;i++)if((i<np)!==!!PV[i])setPv(i);refreshLobby()}
  $("go").disabled=false;$("go").textContent="JEDZIEMY, GRUBASY!";
 }
 
 /* ---------- okno graczy: sterowanie, postać, auto (z podglądem 3D) ---------- */
-const PCOL=["#ff7a45","#5ee6c6","#ffd23f","#b48cff"];
-const KEYTXT=["","WASD · Spacja / Shift / Q / E · powrót R","Strzałki · Enter / Prawy Shift · powrót Delete","IJKL · U / O · powrót P","TFGH · Y / B · powrót V"];
+const PCOL=["#ff7a45","#5ee6c6","#ffd23f","#b48cff","#ff6b9d","#8de04e"];
+const KEYTXT=["","WASD · Spacja / Shift / Q / E · powrót R","Strzałki · Enter / Prawy Shift · powrót Delete","IJKL · U / O · powrót P","TFGH · Y / B · powrót V","VNBM · , / . · powrót C","Num 4/6/8/5 · Num 1/3 · powrót Num 7"];
 let lobbyOpen=false,padTimer=0;
-const PV=[null,null,null,null],PVX=[1000,1040,1080,1120],camPv=new THREE.PerspectiveCamera(34,1,1,3000);
+const PV=Array(6).fill(null),PVX=[1000,1040,1080,1120,1160,1200],camPv=new THREE.PerspectiveCamera(34,1,1,3000);
 const padActive=g=>g.buttons.some(b=>b.pressed)||g.axes.some(a=>Math.abs(a)>0.5);
 let padSig="";
 function padWatch(){const sig=listPads().map(g=>g.index+(padActive(g)?"!":"")).join(",");if(sig!==padSig){padSig=sig;refreshLobby()}}
 const padsConnected=()=>listPads().length;
-const HOV=[null,null,null,null];
+const HOV=Array(6).fill(null);
 function hovCh(i,ci){HOV[i]=ci;setPv(i);refreshLobby()}
 function setPv(i){
  if(PV[i]){scene.remove(PV[i].root);PV[i]=null}
@@ -1969,7 +1955,7 @@ function showWelfokPopup(playerIndex,onPick){
 function hideWelfokPopup(){const o=$("welfokOverlay");if(o)o.hidden=true;welfokOverlayOpen=false;welfokPadDir="";welfokPadA=false;welfokPadB=false;welfokNavAt=0}
 function buildLobby(){
  MODES.forEach(([m],mi)=>{const b=document.createElement("button");b.type="button";b.className="sg";b.textContent=npOf(m)===0?"0 · widz":npOf(m)+(npOf(m)===1?" gracz":" graczy");b.onclick=()=>{SET.mode=m;refreshSet()};$("lbModes").appendChild(b)});
- for(let i=0;i<4;i++){
+ for(let i=0;i<6;i++){
   const c=document.createElement("div");c.className="pc";c.id="pc"+i;c.style.setProperty("--pc",PCOL[i]);
   const pick=(k,l)=>'<div class="pick" data-k="'+k+'"><button type="button" class="ar" data-s="-1" aria-label="Poprzednie: '+l+'">◀</button><div class="pk"><small>'+l+'</small><div class="pk-n"></div><div class="pk-x"></div></div><button type="button" class="ar" data-s="1" aria-label="Następne: '+l+'">▶</button></div>';
   c.innerHTML='<div class="pc-top"><b>GRACZ '+(i+1)+'</b><div class="seg"><button type="button" class="sg" data-d="kb">⌨ Klawiatura</button><button type="button" class="sg" data-d="pad">🎮 Pad</button></div></div><div class="pv"></div><div class="pc-body">'+pick("ch","Postać")+'<div class="cgrid"></div>'+pick("car","Auto")+'<p class="pc-keys"></p><div class="ctl" data-c="pad"><span>Numer pada:</span><div class="seg"></div><button type="button" class="btn alt sm pbt">⚙ Ustaw przyciski</button><button type="button" class="btn alt sm pbr">Domyślne</button></div><div class="ctl" data-c="kb"><button type="button" class="btn alt sm kbt">⚙ Ustaw klawisze</button><button type="button" class="btn alt sm kbr">Domyślne</button></div><div class="kbp" hidden></div><div class="kbp pbp" hidden></div><div class="ctl" data-c="team" hidden><span>Drużyna:</span><select></select></div><div class="ctl"><button type="button" class="btn alt sm rn1">🎲 Losuj zwierzaka i auto</button></div></div>';
@@ -1988,7 +1974,7 @@ function buildLobby(){
    b.onclick=()=>{if(ch.id==="welfok_red"){showWelfokPopup(i);return}if(isUnl(ci)){PL[i].ch=ci;HOV[i]=null;if(i===0)setGarage();setPv(i);refreshSet()}else{HOV[i]=ci;setPv(i);refreshLobby()}};
    cg.appendChild(b);
   });
-  {const sg=c.querySelector('[data-c="pad"] .seg');[["-1","Auto"],["0","1"],["1","2"],["2","3"],["3","4"]].forEach(([v,l])=>{const b=document.createElement("button");b.type="button";b.className="sg";b.textContent=l;b.dataset.p=v;b.onclick=()=>{PL[i].padSel=Number(v);saveCtl();refreshSet()};sg.appendChild(b)});
+  {const sg=c.querySelector('[data-c="pad"] .seg');[["-1","Auto"],["0","1"],["1","2"],["2","3"],["3","4"],["4","5"],["5","6"]].forEach(([v,l])=>{const b=document.createElement("button");b.type="button";b.className="sg";b.textContent=l;b.dataset.p=v;b.onclick=()=>{PL[i].padSel=Number(v);saveCtl();refreshSet()};sg.appendChild(b)});
    const kp=c.querySelector(".kbp");ACT.forEach(([a,l])=>{const d=document.createElement("div");d.innerHTML="<span>"+l+"</span>";const b=document.createElement("button");b.type="button";b.className="kbb";b.dataset.a=a;b.onclick=()=>{REB={i,a};refreshLobby()};d.appendChild(b);kp.appendChild(d)});
    c.querySelector(".kbt").onclick=()=>{kp.hidden=!kp.hidden;REB=null;refreshLobby()};
    c.querySelector(".kbr").onclick=()=>{PL[i].keys=null;REB=null;saveCtl();refreshLobby()};
@@ -2027,7 +2013,7 @@ function ctlRefresh(i,c){
 function refreshLobby(){
  const np=npOf(SET.mode),pads=padsConnected();let pi=0;$("lbH").textContent=np?"Kogo dziś gubi talia?":"Tryb widza: nikt z Was nie jedzie, oglądacie boty 👁";
  [...$("lbModes").children].forEach((b,i)=>b.setAttribute("aria-pressed",MODES[i][0]===SET.mode));
- for(let i=0;i<4;i++){
+ for(let i=0;i<6;i++){
   const c=$("pc"+i);c.hidden=i>=np;if(i>=np)continue;
   const q=PL[i],ch=CHARS[q.ch],car=CARS[q.car];
   {const tr=c.querySelector('[data-c="team"]');tr.hidden=!SET.team.on;
@@ -2051,19 +2037,19 @@ function refreshLobby(){
 }
 function openLobby(){
  lobbyOpen=true;$("lobby").hidden=false;$("menu").style.display="none";
- for(let i=0;i<4;i++)setPv(i);refreshLobby();
+ for(let i=0;i<6;i++)setPv(i);refreshLobby();
  clearInterval(padTimer);padTimer=setInterval(()=>{if(lobbyOpen)refreshLobby()},800);
 }
 function closeLobby(){
  lobbyOpen=false;REBP=null;$("lobby").hidden=true;$("menu").style.display="flex";clearInterval(padTimer);
- for(let i=0;i<4;i++)setPv(i);refreshSet();
+ for(let i=0;i<6;i++)setPv(i);refreshSet();
 }
 function renderLobby(W,H){
  padWatch();
  renderer.setScissorTest(false);renderer.setViewport(0,0,W,H);renderer.setClearColor(0x071524,1);renderer.clear();
  const lr=$("lbCards").getBoundingClientRect();
  renderer.setScissorTest(true);
- for(let i=0;i<4;i++){
+ for(let i=0;i<6;i++){
   if(!PV[i])continue;
   const r=document.querySelector("#pc"+i+" .pv").getBoundingClientRect();
   if(r.width<4||r.height<4)continue;
@@ -2375,7 +2361,7 @@ if(next){
  <h1 class="nmh">GRUBAS <span>KART</span></h1><p class="nmsub">wyścigi foczych grubasów · bez diety od 1987</p>
  <div id="nm-home" class="nmp">
   <button class="nmbig" id="hSolo" style="--c:#ff7a45"><i>🎮</i><span>Gra jednogrubasowa<small>Ty, Twój brzuch i boty</small></span></button>
-  <button class="nmbig" id="hMulti" style="--c:#3fd9b6"><i>👥</i><span>Gra wielogrubasowa<small>2–4 grubasów na jednym ekranie</small></span></button>
+  <button class="nmbig" id="hMulti" style="--c:#3fd9b6"><i>👥</i><span>Gra wielogrubasowa<small>2–6 grubasów na jednym ekranie</small></span></button>
   <button class="nmbig" id="hSpec" style="--c:#ffc933"><i>👁</i><span>Gra bezgrubasowa<small>widz: same boty, Ty oglądasz i chrupiesz</small></span></button>
   <button class="nmbig" id="hGfx" style="--c:#8fb0ff"><i>⚙</i><span>Grafika<small>jakość, cienie, optymalizacja</small></span></button>
   <button class="nmbig" id="hPhonePad" style="--c:#ffd23f"><i>📱</i><span>Zdobądź pada<small>Nie masz pada? To masz już na pewno!</small></span></button>
@@ -2577,7 +2563,7 @@ function pg(n){["home","setup","ctl","pick","opp","gfx"].forEach(p=>{const e=$("
 function show(v){nm.style.display=v?"flex":"none"}
 function chips(id,items,cur,fn){const b=$(id);b.innerHTML="";items.forEach(([v,l])=>{const e=document.createElement("button");e.className="chip";e.type="button";e.textContent=l;e.setAttribute("aria-pressed",String(cur===v));e.onclick=()=>{fn(v);refreshSet();renderSetup()};b.appendChild(e)})}
 function renderSetup(){const np=npOf(SET.mode);
- $("sMulti").hidden=!NM.multi;chips("sNp",[["split","2 grubasy"],["split3","3 grubasy"],["split4","4 grubasy"]],SET.mode,v=>SET.mode=v);
+ $("sMulti").hidden=!NM.multi;chips("sNp",[["split","2 grubasy"],["split3","3 grubasy"],["split4","4 grubasy"],["split5","5 grubasów"],["split6","6 grubasów"]],SET.mode,v=>SET.mode=v);
  chips("sGame",GAMES.map(g=>[g[0],g[1]]),SET.game,v=>SET.game=v);
  $("sTrRow").hidden=SET.game!=="tour";chips("sTr",TOURS.map(n=>[n,n+" wyścigów"]),SET.tourRaces,v=>SET.tourRaces=v);
  chips("sLaps",[1,3,5,7,10].map(n=>[n,""+n]),SET.laps,v=>SET.laps=v);
@@ -2726,7 +2712,7 @@ const GLI=["🔺","☂️","🐟"];
 const kd=new Set(),kp=new Set();let S=null;
 const shf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
 const sch=j=>{const m=MOVE[j+1];return{L:[m[0]],R:[m[1]],gas:[m[2]],brake:[m[3]],item:ITEMK[j+1].slice(),reset:[RESETK[j+1]],drift:[],back:[BACKK[j+1]]}};
-function ctlOpts(){const o=[{dev:"kb",keys:null,l:S.np===1?"⌨ Strzałki / WASD":"⌨ "+KEYTXT[1].split(" · ")[0]}];for(let j=0;j<4;j++)o.push({dev:"kb",keys:sch(j),l:"⌨ "+KEYTXT[j+1].split(" · ")[0]});o.push({dev:"pad",padSel:-1,l:"🎮 Pad (auto)"});listPads().forEach((_,i)=>o.push({dev:"pad",padSel:i,l:"🎮 Pad "+(i+1)}));return o}
+function ctlOpts(){const o=[{dev:"kb",keys:null,l:S.np===1?"⌨ Strzałki / WASD":"⌨ "+KEYTXT[1].split(" · ")[0]}];for(let j=0;j<6;j++)o.push({dev:"kb",keys:sch(j),l:"⌨ "+KEYTXT[j+1].split(" · ")[0]});o.push({dev:"pad",padSel:-1,l:"🎮 Pad (auto)"});listPads().forEach((_,i)=>o.push({dev:"pad",padSel:i,l:"🎮 Pad "+(i+1)}));return o}
 function ctlLabel(p){const q=PL[p];if(q.dev==="pad")return"🎮 Pad"+(q.padSel>=0?" "+(q.padSel+1):" (auto)");if(!q.keys)return S.np===1?"⌨ Strzałki / WASD":"⌨ "+KEYTXT[p+1].split(" · ")[0];const j=[0,1,2,3].find(j=>q.keys.L&&q.keys.L[0]===MOVE[j+1][0]);return j!=null?"⌨ "+KEYTXT[j+1].split(" · ")[0]:"⌨ własne"}
 
 function flash(t){if(!S)return;S.flash=t;S.dirty=1;clearTimeout(S.ft);S.ft=setTimeout(()=>{if(S){S.flash=null;S.dirty=1}},2600)}
@@ -2822,7 +2808,7 @@ function dirs(p){const q=PL[p],o={L:0,R:0,U:0,D:0,ok:0,bk:0},gps=[];
  for(const g of gps){const b=i=>!!(g.buttons[i]&&g.buttons[i].pressed),ax=g.axes[0]||0,ay=g.axes[1]||0;
   o.L=o.L||ax<-.55||b(14);o.R=o.R||ax>.55||b(15);o.U=o.U||ay<-.55||b(12);o.D=o.D||ay>.55||b(13);
   if(g.id==="GRUBAS KART Phone Pad"){
-   const rp=window.remotePhonePad||{};
+   const rp=(window.remotePhonePads&&window.remotePhonePads[p])||window.remotePhonePad||{};
    // Menu: gałka porusza we wszystkich kierunkach; A zatwierdza, B cofa, Y przechodzi dalej.
    o.L=o.L||Number(rp.steer)<-.35;o.R=o.R||Number(rp.steer)>.35;
    o.U=o.U||!!rp.gas;o.D=o.D||!!rp.brake;
@@ -2915,7 +2901,7 @@ function showPage(n){PAGES.forEach(p=>{const e=$("nm-"+p);if(e)e.hidden=p!==n});
 const STEPS=["① Sterowanie","② Postać","③ Pojazd","④ Przeciwnicy (opcjonalnie)","⑤ START"];
 const PRE=[["Domyślny",null],["WASD",0],["Strzałki",1],["IJKL",2],["TFGH",3]],ACTL=Object.fromEntries(ACT);
 const sch=j=>{const m=MOVE[j+1];return{L:[m[0]],R:[m[1]],gas:[m[2]],brake:[m[3]],item:ITEMK[j+1].slice(),reset:[RESETK[j+1]],drift:[],back:[BACKK[j+1]]}};
-const presetOf=q=>{if(!q.keys)return 0;const k=q.keys;for(let j=0;j<4;j++){const m=MOVE[j+1];if(k.L&&k.L[0]===m[0]&&k.R&&k.R[0]===m[1]&&k.gas&&k.gas[0]===m[2]&&k.brake&&k.brake[0]===m[3])return j+1}return -1};
+const presetOf=q=>{if(!q.keys)return 0;const k=q.keys;for(let j=0;j<6;j++){const m=MOVE[j+1];if(k.L&&k.L[0]===m[0]&&k.R&&k.R[0]===m[1]&&k.gas&&k.gas[0]===m[2]&&k.brake&&k.brake[0]===m[3])return j+1}return -1};
 let CP=[],DET=null,CM=null,CMt=0;
 const on=()=>!$("nm-ctl").hidden&&getComputedStyle(nm).display!=="none";
 const flashC=t=>{CM=t;clearTimeout(CMt);CMt=setTimeout(()=>{CM=null;paintCtl()},3500);paintCtl()};
@@ -2933,7 +2919,7 @@ function build(){const np=npOf(SET.mode),host=$("cPnls");host.innerHTML="";CP=[]
   const pre=d.querySelector(".cpPre");PRE.forEach(([l,j])=>{const b=document.createElement("button");b.type="button";b.className="chip";b.textContent=l;b.onclick=()=>{PL[i].keys=j==null?null:sch(j);reset();saveCtl();paintCtl()};pre.appendChild(b);o.preB.push(b)});
   const kp=d.querySelector(".cpKeys");ACT.forEach(([a,l])=>{const r=document.createElement("div");r.innerHTML="<span>"+l+"</span>";const b=document.createElement("button");b.type="button";b.className="kbb";b.onclick=()=>{b.blur();REBP=null;DET=null;REB={i,a};paintCtl()};r.appendChild(b);kp.appendChild(r);o.keyB[a]=b});
   d.querySelector(".kreset").onclick=()=>{PL[i].keys=null;reset();saveCtl();paintCtl()};
-  const nu=d.querySelector(".cpNum");[[-1,"Auto"],[0,"Pad 1"],[1,"Pad 2"],[2,"Pad 3"],[3,"Pad 4"]].forEach(([v,l])=>{const b=document.createElement("button");b.type="button";b.className="chip";b.textContent=l;b.onclick=()=>{PL[i].padSel=v;DET=null;saveCtl();paintCtl()};nu.appendChild(b);o.numB.push([v,b])});
+  const nu=d.querySelector(".cpNum");[[-1,"Auto"],[0,"Pad 1"],[1,"Pad 2"],[2,"Pad 3"],[3,"Pad 4"],[4,"Pad 5"],[5,"Pad 6"]].forEach(([v,l])=>{const b=document.createElement("button");b.type="button";b.className="chip";b.textContent=l;b.onclick=()=>{PL[i].padSel=v;DET=null;saveCtl();paintCtl()};nu.appendChild(b);o.numB.push([v,b])});
   o.det.onclick=()=>{REB=null;REBP=null;DET=DET&&DET.i===i?null:{i};paintCtl()};
   const pb=d.querySelector(".cpPbs");ACT.forEach(([a,l])=>{const r=document.createElement("div");r.innerHTML="<span>"+l+"</span>";const b=document.createElement("button");b.type="button";b.className="kbb";
    b.onclick=()=>{b.blur();let g=null;try{g=padFor(i)||listPads()[0]}catch(e){}if(!g){msg("Podłącz pad i wciśnij na nim przycisk",1500);return}REB=null;DET=null;REBP={i,a,base:g.buttons.map(x=>!!(x&&x.pressed))};paintCtl()};r.appendChild(b);pb.appendChild(r);o.pbB[a]=b});
@@ -3193,13 +3179,13 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
    sdpSemantics:"unified-plan"
   }
  };
- let hostPeer=null,phoneConn=null,hostId=null,phonePeer=null,sendTimer=null;
+ let hostPeer=null,phoneConns=new Map(),hostId=null,phonePeer=null,sendTimer=null,nextPhoneSlot=0;
  const status=(t)=>{const e=$("phonePadStatus");if(e)e.textContent=t;};
  const qrUrl=u=>"https://api.qrserver.com/v1/create-qr-code/?size=320x320&margin=12&data="+encodeURIComponent(u);
  function stopHost(){
   if(hostPeer){try{hostPeer.destroy()}catch(e){}hostPeer=null}
-  phoneConn=null;hostId=null;
-  window.remotePhonePad=null;
+  phoneConns.forEach(c=>{try{c.close()}catch(e){}});phoneConns.clear();nextPhoneSlot=0;hostId=null;
+  window.remotePhonePads=Array(6).fill(null);window.remotePhonePad=null;
   if(sendTimer){clearInterval(sendTimer);sendTimer=null}
  }
  async function startHost(){
@@ -3215,25 +3201,16 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
     status("Gotowe! Zeskanuj kod QR telefonem.");
    });
    hostPeer.on("connection",conn=>{
-    if(phoneConn){try{phoneConn.close()}catch(e){}}
-    phoneConn=conn;
-    conn.on("open",()=>status("📱 Pad połączony!"));
-    conn.on("data",data=>{
-     if(data&&data.type==="pad"){
-      window.remotePhonePad=data.state||null;
-      // Wybierz automatycznie telefon jako kontroler Gracza 1.
-      try{
-       const virtualIndex=listPads().findIndex(g=>g&&g.id==="GRUBAS KART Phone Pad");
-       if(virtualIndex>=0&&typeof PL!=="undefined"&&PL[0]){
-        PL[0].dev="pad";
-        PL[0].padSel=virtualIndex;
-       }
-      }catch(e){}
-      status("📱 Pad połączony — wykryty jako GRUBAS KART Phone Pad!");
-     }
-    });
-    conn.on("close",()=>{window.remotePhonePad=null;phoneConn=null;try{if(typeof PL!=="undefined"&&PL[0]&&PL[0].padSel>=0){const ps=listPads();if(!ps[PL[0].padSel]||ps[PL[0].padSel].id==="GRUBAS KART Phone Pad"){PL[0].dev="kb";PL[0].padSel=-1;}}}catch(e){}status("Pad rozłączony. Zeskanuj QR ponownie.")});
-    conn.on("error",()=>{window.remotePhonePad=null;try{if(typeof PL!=="undefined"&&PL[0]&&PL[0].padSel>=0){PL[0].dev="kb";PL[0].padSel=-1;}}catch(e){}status("Błąd połączenia pada.")});
+    let slot=-1;for(let i=0;i<6;i++)if(!Array.from(phoneConns.values()).some(x=>x.slot===i)){slot=i;break}
+    if(slot<0){try{conn.close()}catch(e){}status("Osiągnięto limit 6 telefonów.");return}
+    phoneConns.set(conn.peer,{conn,slot});
+    conn.on("open",()=>status("📱 Połączone telefony: "+phoneConns.size+"/6"));
+    conn.on("data",data=>{if(data&&data.type==="pad"){
+     window.remotePhonePads=window.remotePhonePads||Array(6).fill(null);window.remotePhonePads[slot]=data.state||null;window.remotePhonePad=window.remotePhonePads[0]||null;
+     status("📱 Połączone telefony: "+phoneConns.size+"/6 · pad nr "+(slot+1));
+    }});
+    const remove=()=>{phoneConns.delete(conn.peer);if(window.remotePhonePads)window.remotePhonePads[slot]=null;window.remotePhonePad=window.remotePhonePads&&window.remotePhonePads[0]||null;status("📱 Połączone telefony: "+phoneConns.size+"/6")};
+    conn.on("close",remove);conn.on("error",remove);
    });
    hostPeer.on("disconnected",()=>status("Utracono połączenie z serwerem parowania. Kliknij „Połącz ponownie”."));
    hostPeer.on("error",e=>{
@@ -3334,8 +3311,67 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
 })();
 </script>
 
-<div id="gameVersion" aria-label="Wersja gry">WERSJA 1.1.7</div>
+<div id="gameVersion" aria-label="Wersja gry">WERSJA 1.1.8</div>
 <style>
 #gameVersion{position:fixed!important;right:18px!important;bottom:14px!important;z-index:2147483647!important;display:block!important;visibility:visible!important;opacity:1!important;color:#fff!important;background:rgba(5,18,32,.82)!important;border:1px solid rgba(230,246,255,.55)!important;border-radius:8px!important;padding:6px 10px!important;font:800 13px Arial,sans-serif!important;letter-spacing:1.5px!important;text-shadow:0 1px 3px #000!important;pointer-events:none!important}
+</style>
+
+<style id="gk-six-player-selection-fit">
+/* Wybór postaci i pojazdu mieści się w sześciu małych panelach. */
+#gkSplit[data-n="5"],#gkSplit[data-n="6"]{
+ grid-template-columns:repeat(3,minmax(0,1fr));
+ grid-template-rows:repeat(2,minmax(0,1fr));
+ grid-auto-rows:minmax(0,1fr);gap:5px;
+}
+#gkSplit[data-n="5"] .gkP,#gkSplit[data-n="6"] .gkP{
+ min-width:0;min-height:0;padding:4px;gap:3px;border-width:2px;border-radius:10px;overflow:hidden;
+}
+#gkSplit[data-n="5"] .gkH,#gkSplit[data-n="6"] .gkH{gap:3px;flex-wrap:nowrap;min-height:22px}
+#gkSplit[data-n="5"] .gkH b,#gkSplit[data-n="6"] .gkH b{font-size:clamp(10px,1.15vw,16px);white-space:nowrap}
+#gkSplit[data-n="5"] .gkSt,#gkSplit[data-n="6"] .gkSt{font-size:clamp(8px,.8vw,10px);white-space:nowrap;overflow:hidden}
+#gkSplit[data-n="5"] .gkH button,#gkSplit[data-n="6"] .gkH button,#gkSplit[data-n="5"] .gkH select,#gkSplit[data-n="6"] .gkH select{font-size:8px;padding:2px 3px;max-width:70px}
+#gkSplit[data-n="5"] .gkM,#gkSplit[data-n="6"] .gkM{gap:3px;flex:1;min-height:0;flex-direction:column}
+#gkSplit[data-n="5"] .gkLft,#gkSplit[data-n="6"] .gkLft{display:none}
+#gkSplit[data-n="5"] .gkIn,#gkSplit[data-n="6"] .gkIn{flex:0 0 auto;max-height:22%;min-height:0;overflow:auto;font-size:8px;line-height:1.15}
+#gkSplit[data-n="5"] .gkIn b,#gkSplit[data-n="6"] .gkIn b{font-size:10px}
+#gkSplit[data-n="5"] .gkG,#gkSplit[data-n="6"] .gkG{flex:1;min-height:0;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:none;grid-auto-rows:minmax(24px,1fr);gap:2px;padding:2px}
+#gkSplit[data-n="5"] .gkT,#gkSplit[data-n="6"] .gkT{border-radius:5px;border-width:1px}
+#gkSplit[data-n="5"] .gkT small,#gkSplit[data-n="6"] .gkT small{font-size:7px;padding:5px 1px 1px}
+#gkSplit[data-n="5"] .gkT.gkBig,#gkSplit[data-n="6"] .gkT.gkBig{grid-column:span 2}
+#gkSplit[data-n="5"] .gkV,#gkSplit[data-n="6"] .gkV{flex:1;min-height:0;grid-template-rows:16px 20px repeat(5,minmax(0,1fr)) 20px;gap:2px}
+#gkSplit[data-n="5"] .gkL,#gkSplit[data-n="6"] .gkL{font-size:8px;letter-spacing:0}
+#gkSplit[data-n="5"] .gkA,#gkSplit[data-n="6"] .gkA{font-size:10px;border-radius:4px}
+#gkSplit[data-n="5"] .gkC,#gkSplit[data-n="6"] .gkC{gap:2px;padding:1px;border-radius:4px}
+#gkSplit[data-n="5"] .gkC span,#gkSplit[data-n="6"] .gkC span{font-size:7px;-webkit-line-clamp:1}
+#gkSplit[data-n="5"] .gkTh,#gkSplit[data-n="6"] .gkTh{width:18px;border-radius:3px}
+#gkSplit[data-n="5"] .gkBand,#gkSplit[data-n="6"] .gkBand{border-width:2px;border-radius:5px}
+#gkSplit[data-n="5"] .gkF,#gkSplit[data-n="6"] .gkF{gap:3px}
+#gkSplit[data-n="5"] .gkF button,#gkSplit[data-n="6"] .gkF button{font-size:10px;padding:4px;border-radius:6px}
+@media(max-aspect-ratio:1/1){
+ #nm .gkpg{height:calc(100dvh - 16px);min-height:0;flex:1 1 auto}
+ #gkSplit[data-n="5"],#gkSplit[data-n="6"]{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr))}
+}
+</style>
+
+<style id="gk-v118-character-picker-fix">
+/* v1.1.8: pełna sylwetka postaci i siatka 6 kolumn x 7 rzędów w trybach 5/6 graczy. */
+#gkSplit[data-n="5"] .gkG,#gkSplit[data-n="6"] .gkG{
+  grid-template-columns:repeat(6,minmax(0,1fr)) !important;
+  grid-template-rows:repeat(7,minmax(0,1fr)) !important;
+  grid-auto-rows:minmax(0,1fr) !important;
+  align-content:stretch;
+  overflow-y:auto;
+}
+#gkSplit[data-n="5"] .gkT,#gkSplit[data-n="6"] .gkT{
+  background-size:contain !important;
+  background-position:center center !important;
+  background-repeat:no-repeat !important;
+  min-height:0;
+}
+/* Wybór postaci pokazuje całą sylwetkę także w małych panelach. */
+#gkSplit[data-n="5"] .gkT small,#gkSplit[data-n="6"] .gkT small{
+  font-size:clamp(6px,.65vw,9px);
+  padding:7px 1px 1px;
+}
 </style>
 </body></html>
