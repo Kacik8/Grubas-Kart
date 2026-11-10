@@ -1385,7 +1385,7 @@ function listPads(){
   if(rp){
    const pressed=i=>!!([
     !!rp.gas,!!rp.brake,!!rp.item,!!rp.reset,!!rp.drift,
-    false,false,false,!!rp.back,false,false,false,
+    false,false,false,!!rp.back,!!rp.pause,false,false,
     false,false,false,false,false
    ][i]);
    const buttons=Array.from({length:17},(_,i)=>({pressed:pressed(i),touched:pressed(i),value:pressed(i)?1:0}));
@@ -3256,14 +3256,15 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
       <button data-pad="A" style="aspect-ratio:1;border-radius:50%;border:3px solid #fff;background:#42b978;color:white;font-size:clamp(16px,4vw,23px);font-weight:1000;touch-action:none">DRIFT</button>
      </div>
     </section>
-    <section style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%">
+    <section style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;width:100%">
      <button data-pad="drift" style="padding:15px 4px;border-radius:12px;border:2px solid #8dc9ec;background:#174363;color:white;font-weight:900">DRIFT</button>
      <button data-pad="reset" style="padding:15px 4px;border-radius:12px;border:2px solid #8dc9ec;background:#174363;color:white;font-weight:900">POWRÓT</button>
      <button data-pad="back" style="padding:15px 4px;border-radius:12px;border:2px solid #8dc9ec;background:#174363;color:white;font-weight:900">PATRZ W TYŁ</button>
+     <button data-pad="pause" style="padding:15px 4px;border-radius:12px;border:2px solid #ffd36b;background:#73501b;color:white;font-weight:1000">⏸ PAUZA</button>
     </section>
-    <footer style="font-size:12px;color:#b8d6e9;text-align:center">Gałka: przód = gaz, tył = hamulec, lewo/prawo = skręt · X = przedmiot · A = drift · Y = patrz w tył</footer>
+    <footer style="font-size:12px;color:#b8d6e9;text-align:center">Gałka: ↑ gaz · ↓ hamulec · ← → skręt · X = przedmiot · A = drift · Y = patrz w tył · PAUZA = zatrzymanie gry</footer>
    </main>`;
-  const state={steer:0,gas:false,brake:false,item:false,drift:false,back:false,reset:false};
+  const state={steer:0,gas:false,brake:false,item:false,drift:false,back:false,reset:false,pause:false};
   const mobileStatus=$("mobileStatus"),stick=$("stickArea"),knob=$("stickKnob");
   let peer=null,conn=null,stickPointer=null;
   const update=()=>{if(conn&&conn.open)try{conn.send({type:"pad",state:{...state}})}catch(e){}};
@@ -3289,8 +3290,8 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
   stick.addEventListener("pointerup",releaseStick);stick.addEventListener("pointercancel",releaseStick);
   document.querySelectorAll("[data-pad]").forEach(b=>{
    const key=b.dataset.pad;
-   b.addEventListener("pointerdown",e=>{e.preventDefault();b.setPointerCapture(e.pointerId);if(key==="A")state.drift=true;if(key==="B")state.brake=true;if(key==="X")state.item=true;if(key==="Y")state.back=true;if(key==="drift")state.drift=true;if(key==="reset")state.reset=true;if(key==="back")state.back=true;b.style.filter="brightness(1.35)"});
-   const up=()=>{if(key==="A")state.drift=false;if(key==="B")state.brake=false;if(key==="X")state.item=false;if(key==="Y")state.back=false;if(key==="drift")state.drift=false;if(key==="reset")state.reset=false;if(key==="back")state.back=false;b.style.filter=""};
+   b.addEventListener("pointerdown",e=>{e.preventDefault();b.setPointerCapture(e.pointerId);if(key==="A")state.drift=true;if(key==="B")state.brake=true;if(key==="X")state.item=true;if(key==="Y")state.back=true;if(key==="drift")state.drift=true;if(key==="reset")state.reset=true;if(key==="back")state.back=true;if(key==="pause")state.pause=true;b.style.filter="brightness(1.35)"});
+   const up=()=>{if(key==="A")state.drift=false;if(key==="B")state.brake=false;if(key==="X")state.item=false;if(key==="Y")state.back=false;if(key==="drift")state.drift=false;if(key==="reset")state.reset=false;if(key==="back")state.back=false;if(key==="pause")state.pause=false;b.style.filter=""};
    b.addEventListener("pointerup",up);b.addEventListener("pointercancel",up);b.addEventListener("lostpointercapture",up);
   });
   loadMobilePeer().then(()=>{
@@ -3315,7 +3316,7 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
 })();
 </script>
 
-<div id="gameVersion" aria-label="Wersja gry">WERSJA 1.1.1</div>
+<div id="gameVersion" aria-label="Wersja gry">WERSJA 1.1.2</div>
 <style>
 #gameVersion{position:fixed!important;right:18px!important;bottom:14px!important;z-index:2147483647!important;display:block!important;visibility:visible!important;opacity:1!important;color:#fff!important;background:rgba(5,18,32,.82)!important;border:1px solid rgba(230,246,255,.55)!important;border-radius:8px!important;padding:6px 10px!important;font:800 13px Arial,sans-serif!important;letter-spacing:1.5px!important;text-shadow:0 1px 3px #000!important;pointer-events:none!important}
 </style>
