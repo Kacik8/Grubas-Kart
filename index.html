@@ -3308,8 +3308,8 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
   stick.addEventListener("pointerup",releaseStick);stick.addEventListener("pointercancel",releaseStick);
   document.querySelectorAll("[data-pad]").forEach(b=>{
    const key=b.dataset.pad;
-   b.addEventListener("pointerdown",e=>{e.preventDefault();b.setPointerCapture(e.pointerId);if(key==="A"){state.drift=true;state.confirm=true}if(key==="B"){state.brake=true;state.cancel=true}if(key==="X")state.item=true;if(key==="Y"){state.back=true;state.next=true}if(key==="drift")state.drift=true;if(key==="reset")state.reset=true;if(key==="back")state.back=true;if(key==="pause")state.pause=true;b.style.filter="brightness(1.35)"});
-   const up=()=>{if(key==="A"){state.drift=false;state.confirm=false}if(key==="B"){state.brake=false;state.cancel=false}if(key==="X")state.item=false;if(key==="Y"){state.back=false;state.next=false}if(key==="drift")state.drift=false;if(key==="reset")state.reset=false;if(key==="back")state.back=false;if(key==="pause")state.pause=false;b.style.filter=""};
+   b.addEventListener("pointerdown",e=>{e.preventDefault();b.setPointerCapture(e.pointerId);if(key==="A"){state.drift=true;state.confirm=true}if(key==="B"){state.brake=true;state.cancel=true}if(key==="X")state.item=true;if(key==="Y"){state.back=true;state.next=true}if(key==="drift")state.drift=true;if(key==="reset")state.reset=true;if(key==="back")state.back=true;if(key==="pause")state.pause=true;b.style.filter="brightness(1.35)";update()});
+   const up=()=>{if(key==="A"){state.drift=false;state.confirm=false}if(key==="B"){state.brake=false;state.cancel=false}if(key==="X")state.item=false;if(key==="Y"){state.back=false;state.next=false}if(key==="drift")state.drift=false;if(key==="reset")state.reset=false;if(key==="back")state.back=false;if(key==="pause")state.pause=false;b.style.filter="";update()};
    b.addEventListener("pointerup",up);b.addEventListener("pointercancel",up);b.addEventListener("lostpointercapture",up);
   });
   loadMobilePeer().then(()=>{
@@ -3334,7 +3334,7 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
 })();
 </script>
 
-<div id="gameVersion" aria-label="Wersja gry">WERSJA 1.1.5</div>
+<div id="gameVersion" aria-label="Wersja gry">WERSJA 1.1.6</div>
 <style>
 #gameVersion{position:fixed!important;right:18px!important;bottom:14px!important;z-index:2147483647!important;display:block!important;visibility:visible!important;opacity:1!important;color:#fff!important;background:rgba(5,18,32,.82)!important;border:1px solid rgba(230,246,255,.55)!important;border-radius:8px!important;padding:6px 10px!important;font:800 13px Arial,sans-serif!important;letter-spacing:1.5px!important;text-shadow:0 1px 3px #000!important;pointer-events:none!important}
 </style>
