@@ -3036,7 +3036,7 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
  }
  const goPage=n=>{["home","setup","ctl","pick","opp","gfx","pad"].forEach(p=>{const e=$g("nm-"+p);if(e)e.hidden=p!==n});nmN.classList.remove("gkm")};
  $g("hGfx").onclick=()=>{render();goPage("gfx")};
- $g("hPhonePad").onclick=()=>{goPage("pad");startHost()};
+ $g("hPhonePad").onclick=()=>{goPage("pad");if(window.startPhonePadHost)window.startPhonePadHost();else{const e=$g("phonePadStatus");if(e)e.textContent="Błąd: moduł pada nie został uruchomiony. Odśwież stronę."}};
  $g("phonePadClose").onclick=()=>goPage("home");
  $g("gBack").onclick=()=>goPage("home");
 })();
@@ -3126,8 +3126,10 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
   if(window.Peer)return resolve();
   const s=document.createElement("script");
   s.src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js";
-  s.onload=resolve;s.onerror=()=>reject(new Error("Nie udało się pobrać biblioteki połączenia."));
+  s.onload=()=>window.Peer?resolve():reject(new Error("Biblioteka PeerJS załadowała się niepoprawnie."));
+  s.onerror=()=>reject(new Error("Nie udało się pobrać PeerJS z unpkg.com. Sprawdź internet lub blokadę skryptów."));
   document.head.appendChild(s);
+  setTimeout(()=>{if(!window.Peer)reject(new Error("Przekroczono czas oczekiwania na PeerJS."));},12000);
  });
  const peerOptions={debug:1};
  let hostPeer=null,phoneConn=null,hostId=null,phonePeer=null,sendTimer=null;
@@ -3160,8 +3162,10 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
     conn.on("error",()=>{window.remotePhonePad=null;status("Błąd połączenia pada.")});
    });
    hostPeer.on("error",e=>status("Błąd połączenia: "+(e.type||e.message||"spróbuj ponownie")));
-  }catch(e){status(e.message||"Nie udało się uruchomić pada.");}
+  }catch(e){status("Błąd uruchamiania: "+(e.message||"Nie udało się uruchomić pada."));}
  }
+ // Udostępnij start menu głównemu — menu i moduł pada są osobnymi skryptami.
+ window.startPhonePadHost=startHost;
  function showDialog(){
   const d=$("phonePadDialog");d.hidden=false;d.style.display="flex";
   if(!hostPeer)startHost();
