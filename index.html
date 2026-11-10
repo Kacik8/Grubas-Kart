@@ -3131,7 +3131,21 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
   document.head.appendChild(s);
   setTimeout(()=>{if(!window.Peer)reject(new Error("Przekroczono czas oczekiwania na PeerJS."));},12000);
  });
- const peerOptions={debug:1};
+ // ICE: STUN + TURN. TURN pomaga, gdy telefon i komputer są za różnymi routerami/NAT.
+ // Serwery Open Relay są publicznym rozwiązaniem współdzielonym; do większej skali warto użyć własnych danych TURN.
+ const peerOptions={
+  debug:2,
+  config:{
+   iceServers:[
+    {urls:"stun:stun.l.google.com:19302"},
+    {urls:"stun:openrelay.metered.ca:80"},
+    {urls:"turn:openrelay.metered.ca:80",username:"openrelayproject",credential:"openrelayproject"},
+    {urls:"turn:openrelay.metered.ca:443",username:"openrelayproject",credential:"openrelayproject"},
+    {urls:"turn:openrelay.metered.ca:443?transport=tcp",username:"openrelayproject",credential:"openrelayproject"}
+   ],
+   sdpSemantics:"unified-plan"
+  }
+ };
  let hostPeer=null,phoneConn=null,hostId=null,phonePeer=null,sendTimer=null;
  const status=(t)=>{const e=$("phonePadStatus");if(e)e.textContent=t;};
  const qrUrl=u=>"https://api.qrserver.com/v1/create-qr-code/?size=320x320&margin=12&data="+encodeURIComponent(u);
@@ -3157,11 +3171,20 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
     if(phoneConn){try{phoneConn.close()}catch(e){}}
     phoneConn=conn;
     conn.on("open",()=>status("📱 Pad połączony!"));
-    conn.on("data",data=>{if(data&&data.type==="pad")window.remotePhonePad=data.state||null});
+    conn.on("data",data=>{
+     if(data&&data.type==="pad"){
+      window.remotePhonePad=data.state||null;
+      status("📱 Pad połączony — sterowanie działa!");
+     }
+    });
     conn.on("close",()=>{window.remotePhonePad=null;phoneConn=null;status("Pad rozłączony. Zeskanuj QR ponownie.")});
     conn.on("error",()=>{window.remotePhonePad=null;status("Błąd połączenia pada.")});
    });
-   hostPeer.on("error",e=>status("Błąd połączenia: "+(e.type||e.message||"spróbuj ponownie")));
+   hostPeer.on("disconnected",()=>status("Utracono połączenie z serwerem parowania. Kliknij „Połącz ponownie”."));
+   hostPeer.on("error",e=>{
+    const typ=e.type||"unknown";
+    status("Błąd komputera: "+typ+". "+(e.message||"Sprawdź internet i odśwież stronę."));
+   });
   }catch(e){status("Błąd uruchamiania: "+(e.message||"Nie udało się uruchomić pada."));}
  }
  // Udostępnij start menu głównemu — menu i moduł pada są osobnymi skryptami.
@@ -3229,8 +3252,18 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
   });
   loadMobilePeer().then(()=>{
    peer=new Peer(undefined,peerOptions);
-   peer.on("open",()=>{conn=peer.connect(decodeURIComponent(hash[1]),{reliable:true});conn.on("open",()=>setStatus("Połączono! Trzymaj telefon poziomo i graj."));conn.on("close",()=>setStatus("Rozłączono. Odśwież stronę, aby połączyć ponownie."));conn.on("error",()=>setStatus("Nie udało się połączyć z grą."));});
-   peer.on("error",e=>setStatus("Błąd: "+(e.type||"połączenia")));
+   peer.on("open",()=>{
+    setStatus("Znaleziono usługę parowania. Łączę z komputerem…");
+    conn=peer.connect(decodeURIComponent(hash[1]),{reliable:true,serialization:"json"});
+    const connectTimeout=setTimeout(()=>{
+     if(!conn||!conn.open)setStatus("Nie udało się zestawić połączenia. Sprawdź, czy komputer nadal pokazuje świeży QR, i spróbuj ponownie.");
+    },18000);
+    conn.on("open",()=>{clearTimeout(connectTimeout);setStatus("🟢 POŁĄCZONO! Trzymaj telefon poziomo i graj.")});
+    conn.on("close",()=>{clearTimeout(connectTimeout);setStatus("Rozłączono. Odśwież stronę, aby połączyć ponownie.")});
+    conn.on("error",e=>{clearTimeout(connectTimeout);setStatus("Błąd kanału danych: "+(e.message||"połączenia"))});
+   });
+   peer.on("disconnected",()=>setStatus("Utracono serwer parowania. Sprawdź internet i odśwież."));
+   peer.on("error",e=>setStatus("Błąd parowania: "+(e.type||e.message||"połączenia")));
   }).catch(e=>setStatus(e.message));
   sendTimer=setInterval(update,35);
   document.addEventListener("visibilitychange",()=>{if(document.hidden){Object.keys(state).forEach(k=>{if(typeof state[k]==="boolean")state[k]=false});resetStick();update()}});
