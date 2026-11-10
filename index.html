@@ -1377,7 +1377,26 @@ const RESETK=[null,"KeyR","Delete","KeyP","KeyV"],BACKK=[null,"KeyZ","Period","K
 const padPrev=[0,{},{},{},{}];
 function padEdge(pn,key,down){const st=padPrev[pn],e=down&&!st[key];st[key]=down;return e}
 function listPads(){
- try{const l=[];for(const g of(navigator.getGamepads?navigator.getGamepads():[]))if(g&&g.connected!==false)l.push(g);return l}catch(e){return[]}
+ try{
+  const l=[];
+  for(const g of(navigator.getGamepads?navigator.getGamepads():[]))if(g&&g.connected!==false)l.push(g);
+  // Telefon podłączony przez GRUBAS KART jest wystawiany grze jako wirtualny pad.
+  const rp=window.remotePhonePad;
+  if(rp){
+   const pressed=i=>!!([
+    !!rp.gas,!!rp.brake,!!rp.item,!!rp.reset,!!rp.drift,
+    false,false,false,!!rp.back,false,false,false,
+    false,false,false,false,false
+   ][i]);
+   const buttons=Array.from({length:17},(_,i)=>({pressed:pressed(i),touched:pressed(i),value:pressed(i)?1:0}));
+   l.push({
+    id:"GRUBAS KART Phone Pad",index:999,connected:true,mapping:"standard",
+    axes:[Math.max(-1,Math.min(1,Number(rp.steer)||0)),0,0,0],
+    buttons,timestamp:performance.now()
+   });
+  }
+  return l;
+ }catch(e){return[]}
 }
 const STDN=["A","B","X","Y","LB","RB","LT","RT","Select","Start","L3","R3","↑","↓","←","→","Home"];
 const PADD_STD={L:[14],R:[15],gas:[12,7,0],brake:[13,6,1],item:[5,2],drift:[4],back:[10,11,8],reset:[3]},PADD_RAW={L:[14],R:[15],gas:[12,0,1,7,5],brake:[13,2,6,4],item:[3],drift:[],back:[8,9],reset:[10,11]};
@@ -3184,11 +3203,19 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
     conn.on("data",data=>{
      if(data&&data.type==="pad"){
       window.remotePhonePad=data.state||null;
-      status("📱 Pad połączony — sterowanie działa!");
+      // Wybierz automatycznie telefon jako kontroler Gracza 1.
+      try{
+       const virtualIndex=listPads().findIndex(g=>g&&g.id==="GRUBAS KART Phone Pad");
+       if(virtualIndex>=0&&typeof PL!=="undefined"&&PL[0]){
+        PL[0].dev="pad";
+        PL[0].padSel=virtualIndex;
+       }
+      }catch(e){}
+      status("📱 Pad połączony — wykryty jako GRUBAS KART Phone Pad!");
      }
     });
-    conn.on("close",()=>{window.remotePhonePad=null;phoneConn=null;status("Pad rozłączony. Zeskanuj QR ponownie.")});
-    conn.on("error",()=>{window.remotePhonePad=null;status("Błąd połączenia pada.")});
+    conn.on("close",()=>{window.remotePhonePad=null;phoneConn=null;try{if(typeof PL!=="undefined"&&PL[0]&&PL[0].padSel>=0){const ps=listPads();if(!ps[PL[0].padSel]||ps[PL[0].padSel].id==="GRUBAS KART Phone Pad"){PL[0].dev="kb";PL[0].padSel=-1;}}}catch(e){}status("Pad rozłączony. Zeskanuj QR ponownie.")});
+    conn.on("error",()=>{window.remotePhonePad=null;try{if(typeof PL!=="undefined"&&PL[0]&&PL[0].padSel>=0){PL[0].dev="kb";PL[0].padSel=-1;}}catch(e){}status("Błąd połączenia pada.")});
    });
    hostPeer.on("disconnected",()=>status("Utracono połączenie z serwerem parowania. Kliknij „Połącz ponownie”."));
    hostPeer.on("error",e=>{
@@ -3282,7 +3309,7 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
 })();
 </script>
 
-<div id="gameVersion" aria-label="Wersja gry">WERSJA 1.0</div>
+<div id="gameVersion" aria-label="Wersja gry">WERSJA 1.1</div>
 <style>
 #gameVersion{position:fixed!important;right:18px!important;bottom:14px!important;z-index:2147483647!important;display:block!important;visibility:visible!important;opacity:1!important;color:#fff!important;background:rgba(5,18,32,.82)!important;border:1px solid rgba(230,246,255,.55)!important;border-radius:8px!important;padding:6px 10px!important;font:800 13px Arial,sans-serif!important;letter-spacing:1.5px!important;text-shadow:0 1px 3px #000!important;pointer-events:none!important}
 </style>
