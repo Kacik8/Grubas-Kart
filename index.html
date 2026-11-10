@@ -2412,7 +2412,7 @@ if(next){
    <img id="phonePadQr" alt="Kod QR do połączenia telefonu jako pada" hidden style="width:min(250px,65vw);height:auto;background:white;padding:10px;border-radius:12px;margin:8px auto">
    <p id="phonePadUrl" style="font-size:11px;overflow-wrap:anywhere;color:#b9d9ee"></p>
    <p class="info">Zeskanuj QR telefonem lub tabletem. Telefon i komputer muszą mieć internet.</p>
-   <p class="info">Gałka: ↑ gaz · ↓ hamulec · ← → skręt. A = zatwierdź w menu / drift w wyścigu · B = wstecz w menu / hamulec w wyścigu · X = przedmiot · Y = dalej w menu / patrz w tył w wyścigu.</p>
+   <p class="info">Automatyczny gaz · gałka w dół: hamulec · ← → skręt. A = zatwierdź w menu / drift w wyścigu · B = wstecz w menu / hamulec w wyścigu · X = przedmiot · Y = dalej w menu / patrz w tył w wyścigu.</p>
    <p class="info">Dodatkowo: DRIFT i POWRÓT.</p>
    <button id="phonePadRetry" class="btn" type="button">Połącz ponownie</button>
   </section>
@@ -3280,9 +3280,9 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
      <button data-pad="back" style="padding:15px 4px;border-radius:12px;border:2px solid #8dc9ec;background:#174363;color:white;font-weight:900">PATRZ W TYŁ</button>
      <button data-pad="pause" style="padding:15px 4px;border-radius:12px;border:2px solid #ffd36b;background:#73501b;color:white;font-weight:1000">⏸ PAUZA</button>
     </section>
-    <footer style="font-size:12px;color:#b8d6e9;text-align:center">↑ gaz · ↓ hamulec · ← → skręt · A zatwierdź/drift · B wstecz/hamulec · X przedmiot · Y dalej/patrz w tył · PAUZA</footer>
+    <footer style="font-size:12px;color:#b8d6e9;text-align:center">automatyczny gaz · gałka w dół: hamulec · ← → skręt · A zatwierdź/drift · B wstecz/hamulec · X przedmiot · Y dalej/patrz w tył · PAUZA</footer>
    </main>`;
-  const state={steer:0,gas:false,brake:false,item:false,drift:false,back:false,reset:false,pause:false,confirm:false,cancel:false,next:false};
+  const state={steer:0,gas:true,brake:false,item:false,drift:false,back:false,reset:false,pause:false,confirm:false,cancel:false,next:false};
   const mobileStatus=$("mobileStatus"),stick=$("stickArea"),knob=$("stickKnob");
   let peer=null,conn=null,stickPointer=null;
   const update=()=>{if(conn&&conn.open)try{conn.send({type:"pad",state:{...state}})}catch(e){}};
@@ -3292,14 +3292,14 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
    const s=document.createElement("script");s.src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js";
    s.onload=resolve;s.onerror=()=>reject(new Error("Brak biblioteki połączenia"));document.head.appendChild(s);
   });
-  function resetStick(){state.steer=0;state.gas=false;state.brake=false;knob.style.left="29%";knob.style.top="29%";update()}
+  function resetStick(){state.steer=0;state.brake=false;state.gas=true;knob.style.left="29%";knob.style.top="29%";update()}
   function moveStick(e){
    const r=stick.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
    let dx=(e.clientX-cx)/(r.width*.34),dy=(e.clientY-cy)/(r.height*.34);
    const len=Math.hypot(dx,dy);if(len>1){dx/=len;dy/=len}
-   // Poziom: skręt. Pion: gaz do przodu i hamulec do tyłu.
+   // Poziom: skręt. Gaz jest automatyczny; wychylenie gałki w dół uruchamia hamulec.
    const dz=.13;state.steer=Math.abs(dx)<dz?0:Math.sign(dx)*Math.min(1,(Math.abs(dx)-dz)/(1-dz));
-   state.gas=dy<-.22;state.brake=dy>.28;
+   state.brake=dy>.28;state.gas=!state.brake;
    knob.style.left=(29+dx*22)+"%";knob.style.top=(29+dy*22)+"%";update();
   }
   stick.addEventListener("pointerdown",e=>{stickPointer=e.pointerId;stick.setPointerCapture(e.pointerId);moveStick(e)});
@@ -3334,7 +3334,7 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
 })();
 </script>
 
-<div id="gameVersion" aria-label="Wersja gry">WERSJA 1.1.6</div>
+<div id="gameVersion" aria-label="Wersja gry">WERSJA 1.1.7</div>
 <style>
 #gameVersion{position:fixed!important;right:18px!important;bottom:14px!important;z-index:2147483647!important;display:block!important;visibility:visible!important;opacity:1!important;color:#fff!important;background:rgba(5,18,32,.82)!important;border:1px solid rgba(230,246,255,.55)!important;border-radius:8px!important;padding:6px 10px!important;font:800 13px Arial,sans-serif!important;letter-spacing:1.5px!important;text-shadow:0 1px 3px #000!important;pointer-events:none!important}
 </style>
