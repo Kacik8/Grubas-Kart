@@ -1,4 +1,14 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
+#gameVersion{
+ position:fixed;right:max(14px,env(safe-area-inset-right,0px));
+ bottom:max(10px,env(safe-area-inset-bottom,0px));
+ z-index:20;pointer-events:none;
+ color:rgba(230,246,255,.72);
+ font:800 12px var(--f-body);
+ letter-spacing:.12em;
+ text-shadow:0 2px 5px rgba(0,0,0,.65);
+}
+</style></head><body>
 <title>GRUBAS KART</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -225,6 +235,7 @@ h1{animation:tf 3.2s ease-in-out infinite}@keyframes tf{50%{transform:translateY
    <p id="gameInfo" class="info" style="margin:6px 0 0;min-height:0"></p>
   </section>
  </div></div>
+  <div id="gameVersion" aria-label="Wersja gry">v1.0</div>
 </div>
 
 <div id="lobby" class="layer" hidden>
