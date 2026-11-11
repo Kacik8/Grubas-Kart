@@ -2164,7 +2164,7 @@ const kf=p=>[...p.querySelectorAll("*")].filter(x=>x.tagName==="BUTTON"||x.tagNa
 const kOf=e=>{let p=e.parentElement;while(p&&!p.id)p=p.parentElement;return p?{id:p.id,i:kf(p).indexOf(e)}:null};
 const vis=e=>!e.disabled&&e.getClientRects().length>0&&getComputedStyle(e).visibility!=="hidden"&&e.getBoundingClientRect().width>0;
 function root(){const L=document.getElementById("lobby"),R=document.getElementById("results"),M=document.getElementById("menu"),PA=document.getElementById("pause");if(typeof G==="undefined")return null;if(G.paused&&PA&&G.state!=="menu")return PA;if(L&&!L.hidden)return L;if(G.resultsShown&&R&&G.state!=="menu")return R;const N=document.getElementById("nm");if(G.state==="menu"&&N&&getComputedStyle(N).display!=="none")return(window.GKACT&&window.GKACT())?null:N;if(G.state==="menu"&&M&&M.style.display!=="none")return M;return null}
-setInterval(()=>{try{const gs=[...(navigator.getGamepads?navigator.getGamepads():[])].filter(x=>x&&x.connected!==false);try{for(const v of listPads())if(v&&v.id==="GRUBAS KART Phone Pad")gs.push(v)}catch(e){}if(!gs.length)return;const r=root();{const dg=document.getElementById("padDbg");if(dg)dg.style.display=r?"":"none"}if(!r){if(cur){cur.classList.remove("padfocus");cur=null}return}
+setInterval(()=>{try{const gs=[...(navigator.getGamepads?navigator.getGamepads():[])].filter(x=>x&&x.connected!==false);try{for(const v of listPads())if(v&&typeof v.id==="string"&&v.id.startsWith("GRUBAS KART Phone Pad"))gs.push(v)}catch(e){}if(!gs.length)return;const r=root();{const dg=document.getElementById("padDbg");if(dg)dg.style.display=r?"":"none"}if(!r){if(cur){cur.classList.remove("padfocus");cur=null}return}
 const pd=(g,i)=>!!(g.buttons[i]&&g.buttons[i].pressed),sd=g=>g.mapping==="standard";
 const hat=g=>{if(sd(g))return[0,0,0,0];const h=g.axes[9];if(typeof h!=="number"||h<-1.01||h>1.01)return[0,0,0,0];const t=Math.round((h+1)*3.5);return[t===5||t===6||t===7,t===1||t===2||t===3,t===0||t===1||t===7,t===3||t===4||t===5]};
 let dir={l:false,r:false,u:false,d:false},a=false,bk=false,next=false,stt=false;
@@ -3367,7 +3367,7 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
 })();
 </script>
 
-<div id="gameVersion" aria-label="Wersja gry">WERSJA 1.1.11</div>
+<div id="gameVersion" aria-label="Wersja gry">WERSJA 1.1.12</div>
 <style>
 #gameVersion{position:fixed!important;right:18px!important;bottom:14px!important;z-index:2147483647!important;display:block!important;visibility:visible!important;opacity:1!important;color:#fff!important;background:rgba(5,18,32,.82)!important;border:1px solid rgba(230,246,255,.55)!important;border-radius:8px!important;padding:6px 10px!important;font:800 13px Arial,sans-serif!important;letter-spacing:1.5px!important;text-shadow:0 1px 3px #000!important;pointer-events:none!important}
 </style>
@@ -3410,7 +3410,7 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
 </style>
 
 <style id="gk-v1111-character-picker-fix">
-/* v1.1.11: pełna sylwetka postaci i siatka 6 kolumn x 7 rzędów w trybach 5/6 graczy. */
+/* v1.1.12: pełna sylwetka postaci i siatka 6 kolumn x 7 rzędów w trybach 5/6 graczy. */
 #gkSplit[data-n="5"] .gkG,#gkSplit[data-n="6"] .gkG{
   grid-template-columns:repeat(6,minmax(0,1fr)) !important;
   grid-template-rows:repeat(7,minmax(0,1fr)) !important;
