@@ -2401,6 +2401,19 @@ if(next){
    <p class="info">Automatyczny gaz · gałka w dół: hamulec · ← → skręt. A = zatwierdź w menu / drift w wyścigu · B = wstecz w menu / hamulec w wyścigu · X = przedmiot · Y = dalej w menu / patrz w tył w wyścigu.</p>
    <p class="info">Dodatkowo: DRIFT i POWRÓT.</p>
    <button id="phonePadRetry" class="btn" type="button">Połącz ponownie</button>
+   <details id="phonePadHelp" style="margin:14px auto 4px;max-width:850px;text-align:left;background:rgba(5,18,32,.48);border:1px solid rgba(141,201,236,.38);border-radius:12px;padding:12px;color:#e8f5ff">
+    <summary style="cursor:pointer;font-weight:1000;font-size:16px;color:#ffd95b">❓ Nie łączy? Otwórz poradnik naprawy</summary>
+    <div style="font-size:13px;line-height:1.55;margin-top:10px">
+     <p style="margin:8px 0"><b>1. Sprawdź, skąd uruchamiasz grę.</b><br>Jeśli otwierasz plik HTML bezpośrednio z dysku (adres zaczyna się od <code>file://</code>), telefon nie otworzy pliku z Twojego komputera. Opublikuj grę na stronie obsługującej HTTPS, np. GitHub Pages lub Netlify, a potem uruchom ją z tego internetowego adresu.</p>
+     <p style="margin:8px 0"><b>2. Otwórz tę samą stronę na obu urządzeniach.</b><br>Na komputerze uruchom grę z adresu HTTPS. Zeskanuj nowy kod QR telefonem. Jeśli skanowanie nie działa, przepisz adres pokazany pod kodem QR.</p>
+     <p style="margin:8px 0"><b>3. Sprawdź internet.</b><br>Komputer i telefon muszą mieć działające połączenie z internetem. Mogą być w różnych sieciach Wi-Fi, ale sieć nie może blokować połączeń WebRTC.</p>
+     <p style="margin:8px 0"><b>4. Wyłącz blokowanie na próbę.</b><br>W Operze GX wyłącz na chwilę blokowanie reklam i trackerów dla tej strony. Wyłącz też VPN oraz rozszerzenia blokujące skrypty. Zezwól stronie na JavaScript, odśwież grę i kliknij „Połącz ponownie”.</p>
+     <p style="margin:8px 0"><b>5. Odśwież oba urządzenia.</b><br>Zamknij kartę pada w telefonie, odśwież grę na komputerze, poczekaj na nowy kod QR i zeskanuj go ponownie. Nie używaj starego kodu.</p>
+     <p style="margin:8px 0"><b>6. Spróbuj innej przeglądarki.</b><br>Jeśli nadal nie działa, sprawdź Chrome lub Edge na komputerze oraz Chrome lub Safari na telefonie. Zaktualizuj przeglądarki do najnowszej wersji.</p>
+     <p style="margin:8px 0"><b>Co oznacza status?</b><br>„Gotowe! Zeskanuj kod QR” oznacza, że komputer czeka na telefon. „Połączone telefony: 1/6” oznacza, że połączenie działa. Jeśli pojawia się błąd, spróbuj kroków powyżej.</p>
+     <p style="margin:8px 0;color:#ffd95b"><b>Ważne:</b> nie zamykaj karty gry na komputerze ani karty pada w telefonie podczas grania.</p>
+    </div>
+   </details>
   </section>
   <div class="gkBar"><button class="btn alt" id="phonePadClose" type="button">◀ Wróć do menu</button></div>
  </div>
@@ -3201,9 +3214,15 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
    hostPeer.on("open",id=>{
     hostId=id;
     const url=location.href.split("#")[0]+"#phonepad="+encodeURIComponent(id);
-    $("phonePadQr").src=qrUrl(url);$("phonePadQr").hidden=false;
-    $("phonePadUrl").textContent=url;
-    status("Gotowe! Zeskanuj kod QR telefonem.");
+    if(location.protocol==="file:"){
+     $("phonePadQr").hidden=true;
+     $("phonePadUrl").textContent="Gra jest uruchomiona lokalnie (file://). Opublikuj ją na HTTPS, np. GitHub Pages lub Netlify, aby telefon mógł otworzyć ten sam adres.";
+     status("⚠️ Gra działa z pliku na komputerze. Telefon nie otworzy lokalnego pliku — sprawdź poradnik poniżej i uruchom grę z adresu HTTPS.");
+    }else{
+     $("phonePadQr").src=qrUrl(url);$("phonePadQr").hidden=false;
+     $("phonePadUrl").textContent=url;
+     status("Gotowe! Zeskanuj kod QR telefonem.");
+    }
    });
    hostPeer.on("connection",conn=>{
     let slot=-1;for(let i=0;i<6;i++)if(!Array.from(phoneConns.values()).some(x=>x.slot===i)){slot=i;break}
@@ -3355,7 +3374,7 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
 })();
 </script>
 
-<div id="gameVersion" aria-label="Wersja gry">WERSJA 1.1.9</div>
+<div id="gameVersion" aria-label="Wersja gry">WERSJA 1.1.10</div>
 <style>
 #gameVersion{position:fixed!important;right:18px!important;bottom:14px!important;z-index:2147483647!important;display:block!important;visibility:visible!important;opacity:1!important;color:#fff!important;background:rgba(5,18,32,.82)!important;border:1px solid rgba(230,246,255,.55)!important;border-radius:8px!important;padding:6px 10px!important;font:800 13px Arial,sans-serif!important;letter-spacing:1.5px!important;text-shadow:0 1px 3px #000!important;pointer-events:none!important}
 </style>
@@ -3397,8 +3416,8 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
 }
 </style>
 
-<style id="gk-v119-character-picker-fix">
-/* v1.1.9: pełna sylwetka postaci i siatka 6 kolumn x 7 rzędów w trybach 5/6 graczy. */
+<style id="gk-v1110-character-picker-fix">
+/* v1.1.10: pełna sylwetka postaci i siatka 6 kolumn x 7 rzędów w trybach 5/6 graczy. */
 #gkSplit[data-n="5"] .gkG,#gkSplit[data-n="6"] .gkG{
   grid-template-columns:repeat(6,minmax(0,1fr)) !important;
   grid-template-rows:repeat(7,minmax(0,1fr)) !important;
