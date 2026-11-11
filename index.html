@@ -3157,14 +3157,19 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
  const hash=location.hash.match(/^#phonepad=([A-Za-z0-9_-]+)$/);
  const loadPeer=()=>new Promise((resolve,reject)=>{
   if(window.Peer)return resolve();
-  const s=document.createElement("script");
-  s.src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js";
-  s.onload=()=>window.Peer?resolve():reject(new Error("Biblioteka PeerJS załadowała się niepoprawnie."));
-  s.onerror=()=>reject(new Error("Nie udało się pobrać PeerJS z unpkg.com. Sprawdź internet lub blokadę skryptów."));
-  document.head.appendChild(s);
-  setTimeout(()=>{if(!window.Peer)reject(new Error("Przekroczono czas oczekiwania na PeerJS."));},12000);
+  const urls=["https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js","https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js","https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"];
+  let i=0,done=false,timer;
+  const next=()=>{
+   if(done)return;
+   if(i>=urls.length){done=true;clearTimeout(timer);reject(new Error("Nie można pobrać PeerJS. Opera GX lub rozszerzenie może blokować CDN/skrypty — zezwól tej stronie na skrypty i spróbuj ponownie."));return;}
+   const s=document.createElement("script");s.async=true;s.src=urls[i++];
+   s.onload=()=>{if(window.Peer&&!done){done=true;clearTimeout(timer);resolve()}else next()};
+   s.onerror=next;document.head.appendChild(s);
+  };
+  timer=setTimeout(()=>{if(!done){done=true;reject(new Error("Timeout ładowania pada. Sprawdź blokowanie skryptów/CDN w przeglądarce."))}},25000);
+  next();
  });
- // ICE: STUN + TURN. TURN pomaga, gdy telefon i komputer są za różnymi routerami/NAT.
+  // ICE: STUN + TURN. TURN pomaga, gdy telefon i komputer są za różnymi routerami/NAT.
  // Serwery Open Relay są publicznym rozwiązaniem współdzielonym; do większej skali warto użyć własnych danych TURN.
  const peerOptions={
   debug:2,
@@ -3265,11 +3270,20 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
   const update=()=>{if(conn&&conn.open)try{conn.send({type:"pad",state:{...state}})}catch(e){}};
   const setStatus=t=>{if(mobileStatus)mobileStatus.textContent=t};
   const loadMobilePeer=()=>new Promise((resolve,reject)=>{
-   if(window.Peer)return resolve();
-   const s=document.createElement("script");s.src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js";
-   s.onload=resolve;s.onerror=()=>reject(new Error("Brak biblioteki połączenia"));document.head.appendChild(s);
-  });
-  function resetStick(){state.steer=0;state.brake=false;state.gas=true;knob.style.left="29%";knob.style.top="29%";update()}
+    if(window.Peer)return resolve();
+    const urls=["https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js","https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js","https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"];
+    let i=0,done=false,timer;
+    const next=()=>{
+     if(done)return;
+     if(i>=urls.length){done=true;clearTimeout(timer);reject(new Error("Nie można załadować PeerJS. Sprawdź blokowanie skryptów/CDN."));return;}
+     const s=document.createElement("script");s.async=true;s.src=urls[i++];
+     s.onload=()=>{if(window.Peer&&!done){done=true;clearTimeout(timer);resolve()}else next()};
+     s.onerror=next;document.head.appendChild(s);
+    };
+    timer=setTimeout(()=>{if(!done){done=true;reject(new Error("Timeout ładowania pada. Sprawdź blokowanie skryptów/CDN."))}},25000);
+    next();
+   });
+    function resetStick(){state.steer=0;state.brake=false;state.gas=true;knob.style.left="29%";knob.style.top="29%";update()}
   function moveStick(e){
    const r=stick.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
    let dx=(e.clientX-cx)/(r.width*.34),dy=(e.clientY-cy)/(r.height*.34);
@@ -3279,13 +3293,13 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
    state.brake=dy>.28;state.gas=!state.brake;
    knob.style.left=(29+dx*22)+"%";knob.style.top=(29+dy*22)+"%";update();
   }
-  stick.addEventListener("pointerdown",e=>{stickPointer=e.pointerId;stick.setPointerCapture(e.pointerId);moveStick(e)});
+  stick.addEventListener("pointerdown",e=>{e.preventDefault();stickPointer=e.pointerId;try{stick.setPointerCapture(e.pointerId)}catch(_){}moveStick(e)});
   stick.addEventListener("pointermove",e=>{if(e.pointerId===stickPointer)moveStick(e)});
   const releaseStick=e=>{if(e.pointerId===stickPointer){stickPointer=null;resetStick()}};
   stick.addEventListener("pointerup",releaseStick);stick.addEventListener("pointercancel",releaseStick);
   document.querySelectorAll("[data-pad]").forEach(b=>{
    const key=b.dataset.pad;
-   b.addEventListener("pointerdown",e=>{e.preventDefault();b.setPointerCapture(e.pointerId);if(key==="A"){state.drift=true;state.confirm=true}if(key==="B"){state.brake=true;state.cancel=true}if(key==="X")state.item=true;if(key==="Y"){state.back=true;state.next=true}if(key==="drift")state.drift=true;if(key==="reset")state.reset=true;if(key==="back")state.back=true;if(key==="pause")state.pause=true;b.style.filter="brightness(1.35)";update()});
+   b.addEventListener("pointerdown",e=>{e.preventDefault();try{b.setPointerCapture(e.pointerId)}catch(_){}if(key==="A"){state.drift=true;state.confirm=true}if(key==="B"){state.brake=true;state.cancel=true}if(key==="X")state.item=true;if(key==="Y"){state.back=true;state.next=true}if(key==="drift")state.drift=true;if(key==="reset")state.reset=true;if(key==="back")state.back=true;if(key==="pause")state.pause=true;b.style.filter="brightness(1.35)";update()});
    const up=()=>{if(key==="A"){state.drift=false;state.confirm=false}if(key==="B"){state.brake=false;state.cancel=false}if(key==="X")state.item=false;if(key==="Y"){state.back=false;state.next=false}if(key==="drift")state.drift=false;if(key==="reset")state.reset=false;if(key==="back")state.back=false;if(key==="pause")state.pause=false;b.style.filter="";update()};
    b.addEventListener("pointerup",up);b.addEventListener("pointercancel",up);b.addEventListener("lostpointercapture",up);
   });
@@ -3301,8 +3315,8 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
     conn.on("close",()=>{clearTimeout(connectTimeout);setStatus("Rozłączono. Odśwież stronę, aby połączyć ponownie.")});
     conn.on("error",e=>{clearTimeout(connectTimeout);setStatus("Błąd kanału danych: "+(e.message||"połączenia"))});
    });
-   peer.on("disconnected",()=>setStatus("Utracono serwer parowania. Sprawdź internet i odśwież."));
-   peer.on("error",e=>setStatus("Błąd parowania: "+(e.type||e.message||"połączenia")));
+   peer.on("disconnected",()=>setStatus("Utracono serwer parowania. Kliknij „Połącz ponownie”."));
+   peer.on("error",e=>setStatus("Błąd parowania: "+(e.type||e.message||"połączenia")+". W Operze GX zezwól stronie na skrypty i WebRTC."));
   }).catch(e=>setStatus(e.message));
   sendTimer=setInterval(update,35);
   document.addEventListener("visibilitychange",()=>{if(document.hidden){Object.keys(state).forEach(k=>{if(typeof state[k]==="boolean")state[k]=false});resetStick();update()}});
@@ -3311,7 +3325,37 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
 })();
 </script>
 
-<div id="gameVersion" aria-label="Wersja gry">WERSJA 1.1.8</div>
+
+<style id="gk-v119-particles-style">
+#gkParticles{position:fixed;inset:0;width:100%;height:100%;z-index:3;pointer-events:none;opacity:.9}
+@media(prefers-reduced-motion:reduce){#gkParticles{display:none}}
+</style>
+<canvas id="gkParticles" aria-hidden="true"></canvas>
+<script id="gk-v119-particles">
+(function(){
+ "use strict";
+ const c=document.getElementById("gkParticles");if(!c||!c.getContext)return;
+ const x=c.getContext("2d",{alpha:true});if(!x)return;
+ if(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+ let w=0,h=0,d=1,mx=-9999,my=-9999,last=0,ps=[];
+ const rnd=(a,b)=>a+Math.random()*(b-a);
+ function make(init){return{x:rnd(0,w),y:init?rnd(0,h):h+8,vx:rnd(-.35,.35),vy:rnd(-.65,-.15),r:rnd(1.2,3.2),age:init?rnd(0,150):0,life:rnd(90,230),hue:rnd(165,205),a:rnd(.25,.7)}}
+ function size(){d=Math.min(devicePixelRatio||1,1.5);w=innerWidth;h=innerHeight;c.width=w*d;c.height=h*d;c.style.width=w+"px";c.style.height=h+"px";x.setTransform(d,0,0,d,0,0);let n=Math.min(85,Math.max(25,Math.round(w*h/18000)));while(ps.length<n)ps.push(make(true));ps.length=n}
+ addEventListener("resize",size,{passive:true});addEventListener("pointermove",e=>{mx=e.clientX;my=e.clientY},{passive:true});addEventListener("pointerleave",()=>{mx=my=-9999},{passive:true});size();
+ function tick(t){requestAnimationFrame(tick);if(t-last<30)return;last=t;
+  const racing=document.body.getAttribute("data-gs")==="game";x.clearRect(0,0,w,h);
+  for(let i=0;i<ps.length;i++){let p=ps[i];p.age++;
+   if(racing){p.x+=p.vx*2+rnd(-.2,.2);p.y+=Math.abs(p.vy)*3+1.2;if(p.y>h+12){ps[i]=make(false);continue}}
+   else{p.x+=p.vx;p.y+=p.vy;if(p.y<-10||p.x<-10||p.x>w+10||p.age>p.life){ps[i]=make(false);continue}
+    let dx=p.x-mx,dy=p.y-my,dist=Math.hypot(dx,dy);if(dist<90&&dist>1){let f=(90-dist)/90*.65;p.x+=dx/dist*f;p.y+=dy/dist*f}}
+   let a=p.a*(racing?.55:.8);x.beginPath();x.fillStyle="hsla("+p.hue+",90%,76%,"+a+")";x.shadowBlur=racing?5:9;x.shadowColor="hsla("+p.hue+",90%,70%,"+a+")";x.arc(p.x,p.y,p.r,0,Math.PI*2);x.fill();
+   if(racing){x.beginPath();x.strokeStyle="rgba(190,235,255,"+(a*.45)+")";x.lineWidth=p.r;x.moveTo(p.x,p.y-2);x.lineTo(p.x-p.vx*2,p.y-13);x.stroke()}
+  }x.shadowBlur=0
+ }requestAnimationFrame(tick)
+})();
+</script>
+
+<div id="gameVersion" aria-label="Wersja gry">WERSJA 1.1.9</div>
 <style>
 #gameVersion{position:fixed!important;right:18px!important;bottom:14px!important;z-index:2147483647!important;display:block!important;visibility:visible!important;opacity:1!important;color:#fff!important;background:rgba(5,18,32,.82)!important;border:1px solid rgba(230,246,255,.55)!important;border-radius:8px!important;padding:6px 10px!important;font:800 13px Arial,sans-serif!important;letter-spacing:1.5px!important;text-shadow:0 1px 3px #000!important;pointer-events:none!important}
 </style>
@@ -3353,8 +3397,8 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
 }
 </style>
 
-<style id="gk-v118-character-picker-fix">
-/* v1.1.8: pełna sylwetka postaci i siatka 6 kolumn x 7 rzędów w trybach 5/6 graczy. */
+<style id="gk-v119-character-picker-fix">
+/* v1.1.9: pełna sylwetka postaci i siatka 6 kolumn x 7 rzędów w trybach 5/6 graczy. */
 #gkSplit[data-n="5"] .gkG,#gkSplit[data-n="6"] .gkG{
   grid-template-columns:repeat(6,minmax(0,1fr)) !important;
   grid-template-rows:repeat(7,minmax(0,1fr)) !important;
