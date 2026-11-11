@@ -2404,14 +2404,13 @@ if(next){
    <details id="phonePadHelp" style="margin:14px auto 4px;max-width:850px;text-align:left;background:rgba(5,18,32,.48);border:1px solid rgba(141,201,236,.38);border-radius:12px;padding:12px;color:#e8f5ff">
     <summary style="cursor:pointer;font-weight:1000;font-size:16px;color:#ffd95b">❓ Nie łączy? Otwórz poradnik naprawy</summary>
     <div style="font-size:13px;line-height:1.55;margin-top:10px">
-     <p style="margin:8px 0"><b>1. Sprawdź, skąd uruchamiasz grę.</b><br>Jeśli otwierasz plik HTML bezpośrednio z dysku (adres zaczyna się od <code>file://</code>), telefon nie otworzy pliku z Twojego komputera. Opublikuj grę na stronie obsługującej HTTPS, np. GitHub Pages lub Netlify, a potem uruchom ją z tego internetowego adresu.</p>
-     <p style="margin:8px 0"><b>2. Otwórz tę samą stronę na obu urządzeniach.</b><br>Na komputerze uruchom grę z adresu HTTPS. Zeskanuj nowy kod QR telefonem. Jeśli skanowanie nie działa, przepisz adres pokazany pod kodem QR.</p>
-     <p style="margin:8px 0"><b>3. Sprawdź internet.</b><br>Komputer i telefon muszą mieć działające połączenie z internetem. Mogą być w różnych sieciach Wi-Fi, ale sieć nie może blokować połączeń WebRTC.</p>
-     <p style="margin:8px 0"><b>4. Wyłącz blokowanie na próbę.</b><br>W Operze GX wyłącz na chwilę blokowanie reklam i trackerów dla tej strony. Wyłącz też VPN oraz rozszerzenia blokujące skrypty. Zezwól stronie na JavaScript, odśwież grę i kliknij „Połącz ponownie”.</p>
-     <p style="margin:8px 0"><b>5. Odśwież oba urządzenia.</b><br>Zamknij kartę pada w telefonie, odśwież grę na komputerze, poczekaj na nowy kod QR i zeskanuj go ponownie. Nie używaj starego kodu.</p>
-     <p style="margin:8px 0"><b>6. Spróbuj innej przeglądarki.</b><br>Jeśli nadal nie działa, sprawdź Chrome lub Edge na komputerze oraz Chrome lub Safari na telefonie. Zaktualizuj przeglądarki do najnowszej wersji.</p>
+     <p style="margin:8px 0"><b>1. Opera GX — sprawdź WebRTC.</b><br>Wpisz w pasku adresu <code>opera://settings</code>, a następnie w wyszukiwarce ustawień wpisz <b>WebRTC</b>. Ustaw opcję <b>Use any suitable network interface (recommended)</b> (Używaj dowolnego odpowiedniego interfejsu sieciowego). Nie wybieraj opcji wyłączającej UDP.</p>
+     <p style="margin:8px 0"><b>2. Wyłącz blokady na próbę.</b><br>Jeśli nadal nie łączy, wyłącz na chwilę VPN, bloker reklam i trackerów oraz rozszerzenia blokujące skrypty. Upewnij się, że JavaScript jest dozwolony.</p>
+     <p style="margin:8px 0"><b>3. Odśwież połączenie.</b><br>Zamknij kartę pada w telefonie, odśwież grę na komputerze, poczekaj na nowy kod QR i zeskanuj go ponownie. Nie używaj starego kodu.</p>
+     <p style="margin:8px 0"><b>4. Sprawdź internet i sieć.</b><br>Oba urządzenia muszą mieć działające połączenie z internetem. Sieć, VPN lub zapora nie mogą blokować połączeń WebRTC.</p>
+     <p style="margin:8px 0"><b>5. Spróbuj innej przeglądarki.</b><br>Jeśli nadal nie działa, sprawdź Chrome lub Edge na komputerze oraz Chrome lub Safari na telefonie. Zaktualizuj przeglądarki do najnowszej wersji.</p>
      <p style="margin:8px 0"><b>Co oznacza status?</b><br>„Gotowe! Zeskanuj kod QR” oznacza, że komputer czeka na telefon. „Połączone telefony: 1/6” oznacza, że połączenie działa. Jeśli pojawia się błąd, spróbuj kroków powyżej.</p>
-     <p style="margin:8px 0;color:#ffd95b"><b>Ważne:</b> nie zamykaj karty gry na komputerze ani karty pada w telefonie podczas grania.</p>
+     <p style="margin:8px 0;color:#ffd95b"><b>Ważne:</b> po zmianie ustawień WebRTC odśwież stronę gry i wygeneruj nowy kod QR.</p>
     </div>
    </details>
   </section>
@@ -3214,15 +3213,9 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
    hostPeer.on("open",id=>{
     hostId=id;
     const url=location.href.split("#")[0]+"#phonepad="+encodeURIComponent(id);
-    if(location.protocol==="file:"){
-     $("phonePadQr").hidden=true;
-     $("phonePadUrl").textContent="Gra jest uruchomiona lokalnie (file://). Opublikuj ją na HTTPS, np. GitHub Pages lub Netlify, aby telefon mógł otworzyć ten sam adres.";
-     status("⚠️ Gra działa z pliku na komputerze. Telefon nie otworzy lokalnego pliku — sprawdź poradnik poniżej i uruchom grę z adresu HTTPS.");
-    }else{
-     $("phonePadQr").src=qrUrl(url);$("phonePadQr").hidden=false;
-     $("phonePadUrl").textContent=url;
-     status("Gotowe! Zeskanuj kod QR telefonem.");
-    }
+    $("phonePadQr").src=qrUrl(url);$("phonePadQr").hidden=false;
+    $("phonePadUrl").textContent=url;
+    status("Gotowe! Zeskanuj kod QR telefonem.");
    });
    hostPeer.on("connection",conn=>{
     let slot=-1;for(let i=0;i<6;i++)if(!Array.from(phoneConns.values()).some(x=>x.slot===i)){slot=i;break}
@@ -3266,7 +3259,7 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
        <div style="position:absolute;inset:7%;border:1px dashed #5b91b4;border-radius:50%;pointer-events:none"></div>
        <div id="stickKnob" style="position:absolute;width:42%;height:42%;left:29%;top:29%;border-radius:50%;background:linear-gradient(#d7f4ff,#3786b5);border:3px solid white;box-sizing:border-box;box-shadow:0 5px 12px #0009;pointer-events:none"></div>
       </div>
-      <div id="stickHint" style="font-size:12px;font-weight:900;text-align:center;color:#d5efff">↑ GAZ · ↓ HAMULEC · ← → SKRĘT</div>
+      <div id="stickHint" style="font-size:12px;font-weight:900;text-align:center;color:#d5efff">↑ GAZ · ↓ HAMULEC · ŚRODEK = LUZ</div>
      </div>
      <div style="display:grid;grid-template-columns:repeat(2,minmax(70px,1fr));gap:12px;width:min(42vw,205px)">
       <button data-pad="Y" style="aspect-ratio:1;border-radius:50%;border:3px solid #fff;background:#f0c83d;color:#1b2430;font-size:clamp(16px,4vw,23px);font-weight:1000;touch-action:none">Y</button>
@@ -3281,7 +3274,7 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
      <button data-pad="back" style="padding:15px 4px;border-radius:12px;border:2px solid #8dc9ec;background:#174363;color:white;font-weight:900">PATRZ W TYŁ</button>
      <button data-pad="pause" style="padding:15px 4px;border-radius:12px;border:2px solid #ffd36b;background:#73501b;color:white;font-weight:1000">⏸ PAUZA</button>
     </section>
-    <footer style="font-size:12px;color:#b8d6e9;text-align:center">automatyczny gaz · gałka w dół: hamulec · ← → skręt · A zatwierdź/drift · B wstecz/hamulec · X przedmiot · Y dalej/patrz w tył · PAUZA</footer>
+    <footer style="font-size:12px;color:#b8d6e9;text-align:center">↑ gaz · ↓ hamulec · puszczona gałka: luz · ← → skręt · A zatwierdź/drift · B wstecz/hamulec · X przedmiot · Y dalej/patrz w tył · PAUZA</footer>
    </main>`;
   const state={steer:0,gas:true,brake:false,item:false,drift:false,back:false,reset:false,pause:false,confirm:false,cancel:false,next:false};
   const mobileStatus=$("mobileStatus"),stick=$("stickArea"),knob=$("stickKnob");
@@ -3302,20 +3295,20 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
     timer=setTimeout(()=>{if(!done){done=true;reject(new Error("Timeout ładowania pada. Sprawdź blokowanie skryptów/CDN."))}},25000);
     next();
    });
-    function resetStick(){state.steer=0;state.brake=false;state.gas=true;knob.style.left="29%";knob.style.top="29%";update()}
+    function resetStick(){state.steer=0;state.brake=false;state.gas=false;knob.style.left="29%";knob.style.top="29%";update()}
   function moveStick(e){
    const r=stick.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
    let dx=(e.clientX-cx)/(r.width*.34),dy=(e.clientY-cy)/(r.height*.34);
    const len=Math.hypot(dx,dy);if(len>1){dx/=len;dy/=len}
    // Poziom: skręt. Gaz jest automatyczny; wychylenie gałki w dół uruchamia hamulec.
    const dz=.13;state.steer=Math.abs(dx)<dz?0:Math.sign(dx)*Math.min(1,(Math.abs(dx)-dz)/(1-dz));
-   state.brake=dy>.28;state.gas=!state.brake;
+   state.brake=dy>.28;state.gas=dy<-.28;
    knob.style.left=(29+dx*22)+"%";knob.style.top=(29+dy*22)+"%";update();
   }
   stick.addEventListener("pointerdown",e=>{e.preventDefault();stickPointer=e.pointerId;try{stick.setPointerCapture(e.pointerId)}catch(_){}moveStick(e)});
   stick.addEventListener("pointermove",e=>{if(e.pointerId===stickPointer)moveStick(e)});
   const releaseStick=e=>{if(e.pointerId===stickPointer){stickPointer=null;resetStick()}};
-  stick.addEventListener("pointerup",releaseStick);stick.addEventListener("pointercancel",releaseStick);
+  stick.addEventListener("pointerup",releaseStick);stick.addEventListener("pointercancel",releaseStick);stick.addEventListener("lostpointercapture",releaseStick);
   document.querySelectorAll("[data-pad]").forEach(b=>{
    const key=b.dataset.pad;
    b.addEventListener("pointerdown",e=>{e.preventDefault();try{b.setPointerCapture(e.pointerId)}catch(_){}if(key==="A"){state.drift=true;state.confirm=true}if(key==="B"){state.brake=true;state.cancel=true}if(key==="X")state.item=true;if(key==="Y"){state.back=true;state.next=true}if(key==="drift")state.drift=true;if(key==="reset")state.reset=true;if(key==="back")state.back=true;if(key==="pause")state.pause=true;b.style.filter="brightness(1.35)";update()});
@@ -3374,7 +3367,7 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
 })();
 </script>
 
-<div id="gameVersion" aria-label="Wersja gry">WERSJA 1.1.10</div>
+<div id="gameVersion" aria-label="Wersja gry">WERSJA 1.1.11</div>
 <style>
 #gameVersion{position:fixed!important;right:18px!important;bottom:14px!important;z-index:2147483647!important;display:block!important;visibility:visible!important;opacity:1!important;color:#fff!important;background:rgba(5,18,32,.82)!important;border:1px solid rgba(230,246,255,.55)!important;border-radius:8px!important;padding:6px 10px!important;font:800 13px Arial,sans-serif!important;letter-spacing:1.5px!important;text-shadow:0 1px 3px #000!important;pointer-events:none!important}
 </style>
@@ -3416,8 +3409,8 @@ body.tch .hudp{padding-bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + m
 }
 </style>
 
-<style id="gk-v1110-character-picker-fix">
-/* v1.1.10: pełna sylwetka postaci i siatka 6 kolumn x 7 rzędów w trybach 5/6 graczy. */
+<style id="gk-v1111-character-picker-fix">
+/* v1.1.11: pełna sylwetka postaci i siatka 6 kolumn x 7 rzędów w trybach 5/6 graczy. */
 #gkSplit[data-n="5"] .gkG,#gkSplit[data-n="6"] .gkG{
   grid-template-columns:repeat(6,minmax(0,1fr)) !important;
   grid-template-rows:repeat(7,minmax(0,1fr)) !important;
